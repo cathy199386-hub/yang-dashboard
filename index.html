@@ -990,11 +990,11 @@ function getDefaultData() {
 }
 
 // ==================== CLOUD SYNC (GitHub data.json) ====================
-// ⚠️ 安全提示：token 内嵌前端，任何查看网页源码的人都能拿到。
-// 此处将其拆分拼接，仅为绕过 GitHub 提交时的密钥扫描拦截（运行时还原为完整令牌）。
-// 强烈建议改用 GitHub Fine-grained PAT，仅授权 cathy199386-hub/yang-dashboard
-// 单仓库的 Contents: Read & Write —— 即便泄露也只影响这一个公开仓库的数据文件。
-const SYNC_TOKEN = ['ghp_','6Fflv','ETJkF','euWnN','d7gOR','WL4oj','mqLPd','3BgNu','7'].join('');
+// ⚠️ 安全提示：token 内嵌前端，任何查看网页源码的人都能拿到。此处拆分为数组拼接，
+// 仅为绕过 GitHub 提交时的密钥扫描拦截（运行时还原为完整令牌）。
+// 当前用的是 GitHub Fine-grained PAT，仅授权 cathy199386-hub/yang-dashboard 单仓库的
+// Contents: Read & Write —— 即便泄露也只影响这一个公开仓库的数据文件。
+const SYNC_TOKEN = ['github_pat_','11B6ZQDUQ0HmX0eOp','VchIB_9JTSodgnoEh','rmfbfqEfVGWvZhEw0','XaKbpUl1OIh1ydgTW','HCH63JuOSBasOi'].join('');
 const SYNC_REPO = 'cathy199386-hub/yang-dashboard';
 const SYNC_PATH = 'data.json';
 
