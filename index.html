@@ -905,35 +905,35 @@ const DAILY_GOODNOTES = [
   {
     title: '挂件气垫席卷包挂圈：美妆正在变配饰',
     tags: ['美妆', '包挂', '通勤', '种草'],
-    cover: '', url: 'https://www.163.com/dy/article/L1TFT8N80519L83M.html',
+    cover: '', url: 'https://www.xiaohongshu.com/search_result?keyword=%E6%8C%82%E4%BB%B6%E6%B0%94%E5%9E%AB',
     note: '#挂件气垫 搜索同比暴涨11600%，带链条挂饰美妆一年热度涨86%；Rhode 唇釉手机壳上线25分钟抢空。',
     date: '2026-07-24'
   },
   {
     title: '复古有线耳机逆袭出圈，成千禧风配饰',
     tags: ['数码配饰', '复古', 'Y2K', '平价'],
-    cover: '', url: 'https://www.toutiao.com/article/7664875584283918867',
+    cover: '', url: 'https://www.xiaohongshu.com/search_result?keyword=%E6%9C%89%E7%BA%BF%E8%80%B3%E6%9C%BA%E7%A9%BF%E6%90%AD',
     note: '小红书「有线耳机穿搭」笔记超10万篇；马卡龙色系19.9–59.9元卖爆，大学生/上班族主力。',
     date: '2026-07-24'
   },
   {
     title: '蝴蝶猫眼水钻穿戴甲，指尖赛博朋克',
     tags: ['美甲', '穿戴甲', '手工', '辣妹'],
-    cover: '', url: 'https://beaut.taobao.com/topic/meijiagongju_9/9646f7dd2b02219ce504a4ba744972a8.html',
+    cover: '', url: 'https://www.xiaohongshu.com/search_result?keyword=%E8%9D%B6%E8%9D%B6%E7%8C%AB%E7%9C%BC%E6%B0%B4%E9%92%BB%E7%A9%BF%E6%88%B4%E7%94%B2',
     note: '小红书爆款手工甲片，M/XS码通用，一贴即美，日常通勤到派对都能hold。',
     date: '2026-07-24'
   },
   {
     title: '红石榴山茶花沐浴露，大容量持久留香',
     tags: ['洗护', '留香', '居家', '性价比'],
-    cover: '', url: 'https://beaut.taobao.com/topic/zhuanti/%E7%BA%A2%E4%B9%A6%E6%8E%A8%E8%8D%90/',
+    cover: '', url: 'https://www.xiaohongshu.com/search_result?keyword=%E7%BA%A2%E7%9F%B3%E6%A6%B4%E5%B1%B1%E8%8C%B6%E8%8A%B1%E6%B2%90%E6%B5%B4%E9%9C%B2',
     note: '以高容量、持久留香、强效滋润俘获用户，小红书高赞居家囤货刚需。',
     date: '2026-07-24'
   },
   {
     title: 'OPPO 联名坚果 P3S，躺平式投影仪',
     tags: ['数码', '投影', '露营', '居家'],
-    cover: '', url: 'https://www.dh3g.com/youxi-110899',
+    cover: '', url: 'https://www.xiaohongshu.com/search_result?keyword=OPPO%E8%81%94%E5%90%8D%E5%9D%9A%E6%9E%9C%E6%8A%95%E5%BD%B1%E4%BB%AA',
     note: '450ANSI流明，镜头90°旋转可投天花板，反向充电，保温杯大小便携露营。',
     date: '2026-07-24'
   },
@@ -1640,19 +1640,11 @@ function renderVideos() {
     </div>
     <div id="goodList"></div>
 
-    <div class="section-title">🎬 热点视频追踪（原有）</div>
+    <div class="section-title">📕 小红书爆款追踪</div>
     <div class="input-row" style="flex-wrap:wrap">
-      <input type="text" id="videoTitle" placeholder="视频标题/描述..." style="min-width:200px">
-      <input type="text" id="videoUrl" placeholder="视频链接（可选）...">
-      <select id="videoSource" style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:0 10px;font-size:12px;font-family:inherit;outline:none">
-        <option value="抖音">抖音</option>
-        <option value="小红书">小红书</option>
-        <option value="B站">B站</option>
-        <option value="视频号">视频号</option>
-        <option value="快手">快手</option>
-        <option value="其他">其他</option>
-      </select>
-      <button class="btn btn-primary" onclick="addVideo()">添加热点</button>
+      <input type="text" id="videoTitle" placeholder="爆款笔记标题/描述..." style="min-width:200px">
+      <input type="text" id="videoUrl" placeholder="小红书笔记链接（xhslink.com，可选）...">
+      <button class="btn btn-primary" onclick="addVideo()">添加追踪</button>
     </div>
     <div id="videoList"></div>
   `;
@@ -1690,16 +1682,15 @@ function renderVideos() {
     videoList.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><p>发现爆款就记下来，二创灵感说来就来</p></div>`;
   } else {
     videoList.innerHTML = data.videos.map(v => {
-      const platformEmoji = { '抖音': '🎵', '小红书': '📕', 'B站': '📺', '视频号': '💬', '快手': '⚡', '其他': '🌐' };
-      const emoji = platformEmoji[v.source] || '📹';
+      const emoji = '📕';
       return `
         <div class="video-card">
           <div class="video-thumb">${emoji}</div>
           <div class="video-info">
             <div class="video-title">${escHtml(v.title)}</div>
             <div class="video-source">
-              <span>${v.source}</span>
-              ${v.url ? `<a href="${escHtml(v.url)}" target="_blank" style="color:var(--accent);font-size:11px">查看链接</a>` : ''}
+              <span>📕 小红书</span>
+              ${v.url ? `<a href="${escHtml(v.url)}" target="_blank" style="color:var(--accent);font-size:11px">查看小红书笔记 ↗</a>` : ''}
               ${v.note ? `<span style="color:var(--orange)">💬 ${escHtml(v.note)}</span>` : ''}
             </div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${v.createdAt || ''}</div>
@@ -1745,10 +1736,9 @@ function saveFromFeed(i) {
 function addVideo() {
   const titleEl = document.getElementById('videoTitle');
   const urlEl = document.getElementById('videoUrl');
-  const sourceEl = document.getElementById('videoSource');
   const title = titleEl.value.trim();
   if (!title) return;
-  data.videos.unshift({ id: uid(), title, url: urlEl.value.trim(), source: sourceEl.value, note: '', createdAt: now() });
+  data.videos.unshift({ id: uid(), title, url: urlEl.value.trim(), source: '小红书', note: '', createdAt: now() });
   saveData(data);
   renderAll();
 }
