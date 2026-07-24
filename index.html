@@ -841,40 +841,81 @@ body {
 }
 
 /* ========== RESPONSIVE ========== */
+/* ====== 手机端抽屉侧边栏 ====== */
 @media (max-width: 768px) {
-  body { flex-direction: column; }
+  body { flex-direction: row; } /* sidebar脱离文档流，body保持row */
   .sidebar {
-    width: 100%;
-    min-width: 0;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    padding: env(safe-area-inset-top, 0) 12px 10px;
-    padding-top: max(env(safe-area-inset-top, 0), 10px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    box-shadow: none;
     border-right: none;
-    border-bottom: 1px solid var(--border);
+    padding: env(safe-area-inset-top, 0) 0 0;
+    overflow-y: auto;
+  }
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.3);
   }
   .sidebar-header {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 0 8px;
-    margin-bottom: 8px;
+    padding: 16px 16px 12px;
     border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
   }
   .sidebar-header .date { display: none; }
-  .sidebar-header > div:last-child { margin-top: 0; }
+  .sidebar-header > div:last-child { margin-top: 8px; }
   .nav-item {
-    width: auto;
-    flex: 0 0 auto;
-    margin: 3px 4px;
-    padding: 8px 12px;
-    font-size: 13px;
+    margin: 2px 8px;
+    padding: 12px 14px;
+    font-size: 14px;
+    border-radius: var(--radius-sm);
   }
-  .nav-badge { margin-left: 6px; }
-  .main-header { padding: 16px 16px 0; }
-  .main-content { padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0)); }
+  .nav-item:active { background: var(--bg-hover); }
+  .nav-badge { margin-left: 8px; }
+
+  /* 汉堡菜单按钮 */
+  .mobile-hamburger {
+    display: flex !important;
+    position: fixed;
+    top: max(env(safe-area-inset-top, 0), 10px);
+    left: 12px;
+    z-index: 900;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: var(--bg-card);
+    color: var(--text);
+    border-radius: var(--radius);
+    font-size: 20px;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* 遮罩层 */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(0,0,0,0.4);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  body.sidebar-open .sidebar-overlay {
+    display: block;
+    opacity: 1;
+  }
+
+  .main-header { padding: 56px 14px 0; }
+  .main-content { padding: 14px; padding-bottom: calc(14px + env(safe-area-inset-bottom, 0)); }
   .overview-grid { grid-template-columns: 1fr; }
   .inspiration-grid { grid-template-columns: 1fr; }
   .feed-grid { grid-template-columns: 1fr 1fr; }
@@ -921,6 +962,10 @@ body {
     <span class="icon">📚</span> 英语学习
   </button>
 </aside>
+
+<!-- 手机端：汉堡菜单 + 遮罩 -->
+<button class="mobile-hamburger" onclick="toggleSidebar()" id="hamburgerBtn" style="display:none" aria-label="菜单">☰</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <!-- ==================== MAIN ==================== -->
 <main class="main">
@@ -2193,6 +2238,52 @@ function importData(file) {
   };
   reader.readAsText(file);
 }
+
+/* ====== 手机端抽屉侧边栏 ====== */
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-open');
+}
+// 导航项点击后自动关闭侧边栏
+document.addEventListener('click', function(e) {
+  if (e.target.closest('.nav-item') && window.innerWidth <= 768) {
+    setTimeout(function() { document.body.classList.remove('sidebar-open'); }, 150);
+  }
+});
+// 触摸滑动：右滑打开 / 左滑关闭
+(function() {
+  var touchStartX = 0, touchStartY = 0, isSwipe = false;
+  var sb = document.querySelector('.sidebar');
+  document.addEventListener('touchstart', function(e) {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    isSwipe = false;
+  }, { passive: true });
+  document.addEventListener('touchmove', function(e) {
+    var dx = e.touches[0].clientX - touchStartX;
+    var dy = Math.abs(e.touches[0].clientY - touchStartY);
+    if (Math.abs(dx) > dy && Math.abs(dx) > 20) isSwipe = true;
+    // 跟随手指拖动（仅左边缘区域或已打开时）
+    if (!isSwipe) return;
+    var open = document.body.classList.contains('sidebar-open');
+    if (!open && touchStartX < 30 && dx > 0) {
+      sb.style.transform = 'translateX(' + Math.min(dx - 260, 0) + 'px)';
+      sb.style.transition = 'none';
+    } else if (open && dx < 0) {
+      sb.style.transform = 'translateX(' + Math.max(dx, -260) + 'px)';
+      sb.style.transition = 'none';
+    }
+  }, { passive: true });
+  document.addEventListener('touchend', function(e) {
+    if (!isSwipe) { sb.style.transition = ''; sb.style.transform = ''; return; }
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    var open = document.body.classList.contains('sidebar-open');
+    sb.style.transition = '';
+    sb.style.transform = '';
+    // 滑动超过80px算有效操作
+    if (!open && dx > 80) toggleSidebar();
+    else if (open && dx < -80) toggleSidebar();
+  }, { passive: true });
+})();
 </script>
 </body>
 </html>
