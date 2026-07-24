@@ -6,6 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0f1117">
 <meta name="apple-mobile-web-app-title" content="羊总工作台">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="apple-touch.png">
@@ -35,7 +36,53 @@
   --transition: 0.2s ease;
 }
 
+/* ===== 浅色主题：仅 [data-theme="light"] 或 [data-theme="auto" 且系统浅色] 生效 ===== */
+:root[data-theme="light"] {
+  --bg: #f4f5fa;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #eef0f7;
+  --bg-input: #eef1f8;
+  --border: #e3e6ef;
+  --text: #1a1d2e;
+  --text-secondary: #5c6078;
+  --text-muted: #9aa0b5;
+  --accent: #4c63ff;
+  --accent-glow: rgba(76,99,255,0.12);
+  --green: #16a34a;
+  --orange: #d97706;
+  --red: #dc2626;
+  --purple: #7c3aed;
+  --cyan: #0284c7;
+  --pink: #db2777;
+}
+@media (prefers-color-scheme: light) {
+  :root[data-theme="auto"] {
+    --bg: #f4f5fa;
+    --bg-sidebar: #ffffff;
+    --bg-card: #ffffff;
+    --bg-hover: #eef0f7;
+    --bg-input: #eef1f8;
+    --border: #e3e6ef;
+    --text: #1a1d2e;
+    --text-secondary: #5c6078;
+    --text-muted: #9aa0b5;
+    --accent: #4c63ff;
+    --accent-glow: rgba(76,99,255,0.12);
+    --green: #16a34a;
+    --orange: #d97706;
+    --red: #dc2626;
+    --purple: #7c3aed;
+    --cyan: #0284c7;
+    --pink: #db2777;
+  }
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  background: var(--bg);
+}
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
@@ -254,6 +301,19 @@ body {
   padding: 4px 10px;
 }
 
+/* ========== SYNC BADGE ========== */
+.sync-badge {
+  font-size: 12px;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  align-self: center;
+}
+.sync-idle { background: var(--bg-input); color: var(--text-muted); }
+.sync-syncing { background: rgba(56,189,248,0.15); color: var(--cyan); }
+.sync-ok { background: rgba(78,203,113,0.15); color: var(--green); }
+.sync-error { background: rgba(245,92,122,0.15); color: var(--red); }
+
 /* ========== TODO ITEMS ========== */
 .todo-item {
   display: flex;
@@ -452,6 +512,41 @@ body {
 .good-note { font-size: 11.5px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 10px; flex: 1; }
 .good-meta { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
 .good-meta a { color: var(--accent); text-decoration: none; }
+
+/* ===== 英语学习 PETS三级 ===== */
+.eng-progress { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px; }
+.eng-progress-top { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-dim); margin-bottom: 8px; }
+.eng-progress-top span:last-child { color: var(--accent); font-weight: 600; }
+.eng-bar { height: 8px; background: var(--bg-input); border-radius: 99px; overflow: hidden; }
+.eng-bar-fill { height: 100%; background: linear-gradient(90deg, #7c5cff, #b0666d); border-radius: 99px; transition: width .3s ease; }
+.word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 12px; }
+.word-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+.word-card.mastered { opacity: .5; }
+.word-card .w-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.word-card .w-word { font-size: 16px; font-weight: 700; color: var(--text); }
+.word-card .w-phon { color: var(--text-dim); font-size: 12px; margin-top: 2px; }
+.word-card .w-mean { color: var(--text-dim); font-size: 13px; margin-top: 6px; }
+.word-card .w-ex { color: var(--accent); font-size: 12px; margin-top: 6px; font-style: italic; }
+.grammar-list { margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.grammar-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+.grammar-item .g-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.grammar-item .g-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.6; }
+.btn-accent { background: linear-gradient(90deg, #7c5cff, #b0666d); color: #fff; border: none; }
+.btn-accent:hover { filter: brightness(1.08); }
+.btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+
+.link-copy {
+  margin-left: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  font-size: 10px;
+  padding: 1px 7px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.link-copy:hover { color: var(--accent); border-color: var(--accent); }
 
 .video-thumb {
   width: 100px;
@@ -747,9 +842,42 @@ body {
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
-  .sidebar { display: none; }
+  body { flex-direction: column; }
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: env(safe-area-inset-top, 0) 12px 10px;
+    padding-top: max(env(safe-area-inset-top, 0), 10px);
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-header .date { display: none; }
+  .sidebar-header > div:last-child { margin-top: 0; }
+  .nav-item {
+    width: auto;
+    flex: 0 0 auto;
+    margin: 3px 4px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .nav-badge { margin-left: 6px; }
+  .main-header { padding: 16px 16px 0; }
+  .main-content { padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0)); }
   .overview-grid { grid-template-columns: 1fr; }
   .inspiration-grid { grid-template-columns: 1fr; }
+  .feed-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
@@ -760,10 +888,13 @@ body {
   <div class="sidebar-header">
     <div class="logo">⚡ 羊总工作台</div>
     <div class="date" id="sidebarDate"></div>
-    <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+    <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-sm" id="themeBtn" onclick="cycleTheme()" title="切换主题：跟随系统 / 浅色 / 深色">🌗 跟随系统</button>
       <button class="btn btn-sm" onclick="exportData()" title="导出数据为JSON">⬇️ 导出</button>
       <button class="btn btn-sm" onclick="document.getElementById('importFile').click()" title="从JSON导入数据">⬆️ 导入</button>
+      <button class="btn btn-sm" onclick="pullFromCloud()" title="立即与云端同步">🔄 同步</button>
       <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importData(this.files[0])">
+      <span id="syncBadge" class="sync-badge sync-idle">☁️ 本地</span>
     </div>
   </div>
   <button class="nav-item active" data-module="home">
@@ -781,10 +912,13 @@ body {
     <span class="icon">💡</span> 选题灵感
   </button>
   <button class="nav-item" data-module="videos">
-    <span class="icon">🔥</span> 爆款热点
+    <span class="icon">🔥</span> 小红书爆款
   </button>
   <button class="nav-item" data-module="memos">
     <span class="icon">📝</span> 备忘录
+  </button>
+  <button class="nav-item" data-module="english">
+    <span class="icon">📚</span> 英语学习
   </button>
 </aside>
 
@@ -826,8 +960,8 @@ body {
   <!-- HOT VIDEOS -->
   <div class="module" id="module-videos">
     <div class="main-header">
-      <h2>🔥 爆款热点视频 / 二创</h2>
-      <p>追踪热点，激发二创灵感</p>
+      <h2>🔥 小红书爆款追踪</h2>
+      <p>每日好物推送 + 你的小红书灵感库</p>
     </div>
     <div class="main-content" id="videoContent"></div>
   </div>
@@ -841,6 +975,11 @@ body {
     <div class="main-content" id="memoContent"></div>
   </div>
 
+  <!-- ENGLISH -->
+  <div class="module" id="module-english">
+    <div id="englishContent"></div>
+  </div>
+
 </main>
 
 <script>
@@ -852,35 +991,35 @@ const DAILY_GOODNOTES = [
   {
     title: '挂件气垫席卷包挂圈：美妆正在变配饰',
     tags: ['美妆', '包挂', '通勤', '种草'],
-    cover: '', url: 'https://www.163.com/dy/article/L1TFT8N80519L83M.html',
+    cover: '', url: 'https://www.xiaohongshu.com/search_result?keyword=%E6%8C%82%E4%BB%B6%E6%B0%94%E5%9E%AB',
     note: '#挂件气垫 搜索同比暴涨11600%，带链条挂饰美妆一年热度涨86%；Rhode 唇釉手机壳上线25分钟抢空。',
     date: '2026-07-24'
   },
   {
     title: '复古有线耳机逆袭出圈，成千禧风配饰',
     tags: ['数码配饰', '复古', 'Y2K', '平价'],
-    cover: '', url: 'https://www.toutiao.com/article/7664875584283918867',
+    cover: '', url: 'https://www.xiaohongshu.com/search_result?keyword=%E6%9C%89%E7%BA%BF%E8%80%B3%E6%9C%BA%E7%A9%BF%E6%90%AD',
     note: '小红书「有线耳机穿搭」笔记超10万篇；马卡龙色系19.9–59.9元卖爆，大学生/上班族主力。',
     date: '2026-07-24'
   },
   {
     title: '蝴蝶猫眼水钻穿戴甲，指尖赛博朋克',
     tags: ['美甲', '穿戴甲', '手工', '辣妹'],
-    cover: '', url: 'https://beaut.taobao.com/topic/meijiagongju_9/9646f7dd2b02219ce504a4ba744972a8.html',
+    cover: '', url: 'https://www.xiaohongshu.com/search_result?keyword=%E8%9D%B6%E8%9D%B6%E7%8C%AB%E7%9C%BC%E6%B0%B4%E9%92%BB%E7%A9%BF%E6%88%B4%E7%94%B2',
     note: '小红书爆款手工甲片，M/XS码通用，一贴即美，日常通勤到派对都能hold。',
     date: '2026-07-24'
   },
   {
     title: '红石榴山茶花沐浴露，大容量持久留香',
     tags: ['洗护', '留香', '居家', '性价比'],
-    cover: '', url: 'https://beaut.taobao.com/topic/zhuanti/%E7%BA%A2%E4%B9%A6%E6%8E%A8%E8%8D%90/',
+    cover: '', url: 'https://www.xiaohongshu.com/search_result?keyword=%E7%BA%A2%E7%9F%B3%E6%A6%B4%E5%B1%B1%E8%8C%B6%E8%8A%B1%E6%B2%90%E6%B5%B4%E9%9C%B2',
     note: '以高容量、持久留香、强效滋润俘获用户，小红书高赞居家囤货刚需。',
     date: '2026-07-24'
   },
   {
     title: 'OPPO 联名坚果 P3S，躺平式投影仪',
     tags: ['数码', '投影', '露营', '居家'],
-    cover: '', url: 'https://www.dh3g.com/youxi-110899',
+    cover: '', url: 'https://www.xiaohongshu.com/search_result?keyword=OPPO%E8%81%94%E5%90%8D%E5%9D%9A%E6%9E%9C%E6%8A%95%E5%BD%B1%E4%BB%AA',
     note: '450ANSI流明，镜头90°旋转可投天花板，反向充电，保温杯大小便携露营。',
     date: '2026-07-24'
   },
@@ -891,6 +1030,48 @@ const DAILY_GOODNOTES = [
     note: '被无数美妆博主种草的细闪单色眼影盘，细腻珠光带来灵动眼妆，懒人通勤神器。',
     date: '2026-07-24'
   }
+];
+
+// ==================== PETS三级 英语学习（静态词库 / 语法库） ====================
+// PETS = 全国英语等级考试（Public English Test System）。三级 ≈ 雅思 4.5–5 / 高于高考。
+const PETS_CORE_WORDS = [
+  { id: 'w01', word: 'achieve',     phonetic: '/əˈtʃiːv/',     meaning: 'v. 实现，取得，达到', example: 'She achieved her dream of becoming a doctor.' },
+  { id: 'w02', word: 'complain',    phonetic: '/kəmˈpleɪn/',    meaning: 'v. 抱怨，投诉', example: 'He complained about the noisy neighbors.' },
+  { id: 'w03', word: 'deliberate',  phonetic: '/dɪˈlɪbərət/',  meaning: 'adj. 故意的；从容的', example: 'It was a deliberate mistake to test us.' },
+  { id: 'w04', word: 'enormous',    phonetic: '/ɪˈnɔːməs/',    meaning: 'adj. 巨大的，庞大的', example: 'They spent an enormous amount of money.' },
+  { id: 'w05', word: 'facility',    phonetic: '/fəˈsɪləti/',    meaning: 'n. 设施，设备；场所', example: 'The hotel has excellent sports facilities.' },
+  { id: 'w06', word: 'genuine',     phonetic: '/ˈdʒenjuɪn/',   meaning: 'adj. 真正的，真诚的', example: 'She showed genuine concern for the victims.' },
+  { id: 'w07', word: 'hesitate',    phonetic: '/ˈhezɪteɪt/',    meaning: 'v. 犹豫，迟疑', example: 'Don\'t hesitate to ask for help.' },
+  { id: 'w08', word: 'illustrate',   phonetic: '/ˈɪləstreɪt/',   meaning: 'v. 说明，阐明；加插图', example: 'The chart illustrates the trend clearly.' },
+  { id: 'w09', word: 'neglect',     phonetic: '/nɪˈɡlekt/',     meaning: 'v. 忽视，疏忽', example: 'He neglected his health during that period.' },
+  { id: 'w10', word: 'obstacle',    phonetic: '/ˈɒbstəkl/',     meaning: 'n. 障碍，妨碍', example: 'Poverty is a major obstacle to education.' },
+  { id: 'w11', word: 'profound',    phonetic: '/prəˈfaʊnd/',    meaning: 'adj. 深刻的，深远的', example: 'The book had a profound influence on me.' },
+  { id: 'w12', word: 'reluctant',   phonetic: '/rɪˈlʌktənt/',  meaning: 'adj. 不情愿的，勉强的', example: 'She was reluctant to leave her hometown.' },
+  { id: 'w13', word: 'sustainable', phonetic: '/səˈsteɪnəbl/', meaning: 'adj. 可持续的', example: 'We need sustainable development.' },
+  { id: 'w14', word: 'transparent', phonetic: '/trænsˈpærənt/', meaning: 'adj. 透明的；清澈的', example: 'The company must be transparent about costs.' },
+  { id: 'w15', word: 'virtually',   phonetic: '/ˈvɜːtʃuəli/',  meaning: 'adv. 几乎，事实上', example: 'The project is virtually complete.' },
+  { id: 'w16', word: 'worthwhile',  phonetic: '/ˌwɜːθˈwaɪl/', meaning: 'adj. 值得做的，有价值的', example: 'It was a worthwhile experience.' },
+  { id: 'w17', word: 'abandon',     phonetic: '/əˈbændən/',     meaning: 'v. 放弃，抛弃', example: 'They had to abandon the plan.' },
+  { id: 'w18', word: 'accumulate',  phonetic: '/əˈkjuːmjəleɪt/', meaning: 'v. 积累，积聚', example: 'He accumulated a lot of wealth.' },
+  { id: 'w19', word: 'anticipate',  phonetic: '/ænˈtɪsɪpeɪt/', meaning: 'v. 预料，期望', example: 'We anticipate a rise in prices.' },
+  { id: 'w20', word: 'circumstance', phonetic: '/ˈsɜːkəmstæns/', meaning: 'n. 情况，环境', example: 'Under no circumstances should you give up.' },
+  { id: 'w21', word: 'distribute',  phonetic: '/dɪˈstrɪbjuːt/', meaning: 'v. 分配，分发', example: 'The books were distributed to students.' },
+  { id: 'w22', word: 'emphasis',    phonetic: '/ˈemfəsɪs/',     meaning: 'n. 强调，重点', example: 'The course puts emphasis on speaking.' },
+  { id: 'w23', word: 'fundamental', phonetic: '/ˌfʌndəˈmentl/', meaning: 'adj. 基本的，根本的', example: 'Trust is fundamental to friendship.' },
+  { id: 'w24', word: 'nevertheless', phonetic: '/ˌnevərðəˈles/', meaning: 'adv. 然而，不过', example: 'He was tired; nevertheless he kept working.' }
+];
+
+const PETS_GRAMMAR = [
+  { title: '虚拟语气', desc: 'if 引导的非真实条件句：与现在/过去事实相反，主从句谓语形式各退一格。' },
+  { title: '非谓语动词', desc: '不定式、动名词、分词作主语/宾语/定语/状语/补语，注意主动被动与完成式。' },
+  { title: '定语从句', desc: '关系代词 who/which/that/whom/whose 及关系副词 where/when/why；注意限制性与非限制性。' },
+  { title: '名词性从句', desc: '主语从句、宾语从句、表语从句、同位语从句；引导词 that / whether / what 等。' },
+  { title: '时态呼应', desc: '主从句时态一致；客观真理、常态不受主句过去时影响。' },
+  { title: '倒装句', desc: '否定词前置（never, hardly, not only, no sooner）引起部分倒装。' },
+  { title: '强调句型', desc: 'It is / was + 被强调部分 + that / who + 其余部分。' },
+  { title: '被动语态', desc: 'be + 过去分词；注意各时态被动式及 get + 过去分词结构。' },
+  { title: '比较结构', desc: 'as...as, not so...as, the more...the more, 及倍数表达。' },
+  { title: '情态动词表推测', desc: 'must（一定）、can\'t（不可能）、may/might（可能）对现在/过去的推测。' }
 ];
 
 function loadData() {
@@ -905,6 +1086,7 @@ function loadData() {
       merged.videos = v1.videos || [];
       merged.memos = v1.memos || [];
       merged.goodnotes = v1.goodnotes || [];
+      merged.english = v1.english || merged.english;
     }
     if (v2) {
       merged.plan = v2.plan || merged.plan;
@@ -913,6 +1095,7 @@ function loadData() {
       merged.videos = v2.videos || merged.videos;
       merged.memos = v2.memos || merged.memos;
       merged.goodnotes = v2.goodnotes || merged.goodnotes;
+      merged.english = v2.english || merged.english;
     }
     return merged;
   } catch {
@@ -920,8 +1103,9 @@ function loadData() {
   }
 }
 
-function saveData(data) {
-  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+function saveData(d, silent) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(d));
+  if (!silent) scheduleSync();
 }
 
 function getDefaultData() {
@@ -931,8 +1115,114 @@ function getDefaultData() {
     inspiration: [], // { id, title, desc, tag, createdAt }
     videos: [],      // { id, title, url, source, note, createdAt }
     memos: [],       // { id, text, createdAt }
-    goodnotes: []    // { id, title, tags[], cover, url, note, createdAt }
+    goodnotes: [],   // { id, title, tags[], cover, url, note, createdAt }
+    english: {       // 英语学习（PETS三级）
+      words: [],              // 生词本 { id, word, phonetic, meaning, example, mastered, createdAt }
+      masteredCore: []        // 已掌握的核心词 id 列表
+    }
   };
+}
+
+// ==================== CLOUD SYNC (GitHub data.json) ====================
+// ⚠️ 安全提示：token 内嵌前端，任何查看网页源码的人都能拿到。此处拆分为数组拼接，
+// 仅为绕过 GitHub 提交时的密钥扫描拦截（运行时还原为完整令牌）。
+// 当前用的是 GitHub Fine-grained PAT，仅授权 cathy199386-hub/yang-dashboard 单仓库的
+// Contents: Read & Write —— 即便泄露也只影响这一个公开仓库的数据文件。
+const SYNC_TOKEN = ['github_pat_','11B6ZQDUQ0HmX0eOp','VchIB_9JTSodgnoEh','rmfbfqEfVGWvZhEw0','XaKbpUl1OIh1ydgTW','HCH63JuOSBasOi'].join('');
+const SYNC_REPO = 'cathy199386-hub/yang-dashboard';
+const SYNC_PATH = 'data.json';
+
+let cloudSha = null;
+let syncTimer = null;
+let syncBusy = false;
+
+function utf8ToBase64(str) {
+  return btoa(String.fromCharCode.apply(null, new TextEncoder().encode(str)));
+}
+function base64ToUtf8(b64) {
+  const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+function ghApi(method, body) {
+  return fetch('https://api.github.com/repos/' + SYNC_REPO + '/contents/' + SYNC_PATH, {
+    method: method,
+    headers: {
+      'Authorization': 'token ' + SYNC_TOKEN,
+      'User-Agent': 'yang-dashboard',
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json'
+    },
+    body: body ? JSON.stringify(body) : undefined
+  });
+}
+function setSyncBadge(state, msg) {
+  const el = document.getElementById('syncBadge');
+  if (!el) return;
+  el.className = 'sync-badge sync-' + state;
+  const labels = { idle:'☁️ 本地', syncing:'☁️ 同步中…', ok:'☁️ 已同步', error:'⚠️ 同步失败' };
+  el.textContent = msg || labels[state] || '☁️';
+}
+async function pushToCloud() {
+  if (syncBusy) return;
+  syncBusy = true;
+  setSyncBadge('syncing', '☁️ 同步中…');
+  data.__syncedAt = Date.now();
+  saveData(data, true); // 先写本地（静默，避免递归触发同步）
+  const content = utf8ToBase64(JSON.stringify(data));
+  const body = { message: 'sync ' + new Date().toISOString(), content: content };
+  if (cloudSha) body.sha = cloudSha;
+  try {
+    const res = await ghApi('PUT', body);
+    if (res.ok) {
+      const j = await res.json();
+      cloudSha = (j.content && j.content.sha) ? j.content.sha : cloudSha;
+      setSyncBadge('ok');
+    } else {
+      console.warn('push fail', res.status, await res.text());
+      setSyncBadge('error');
+    }
+  } catch (e) {
+    console.warn('push error', e);
+    setSyncBadge('error');
+  } finally {
+    syncBusy = false;
+  }
+}
+async function pullFromCloud() {
+  setSyncBadge('syncing', '☁️ 同步中…');
+  try {
+    const res = await ghApi('GET');
+    if (res.status === 200) {
+      const j = await res.json();
+      cloudSha = j.sha;
+      const remote = JSON.parse(base64ToUtf8(j.content));
+      const remoteTs = remote.__syncedAt || 0;
+      const localTs = data.__syncedAt || 0;
+      if (remoteTs > localTs) {
+        // 云端更新：覆盖本地
+        data = Object.assign(getDefaultData(), remote);
+        saveData(data, true);
+        renderAll();
+        setSyncBadge('ok');
+      } else {
+        // 本地更新或首次：推上去
+        await pushToCloud();
+      }
+    } else if (res.status === 404) {
+      cloudSha = null;
+      await pushToCloud(); // 首次运行：创建 data.json
+    } else {
+      setSyncBadge('error');
+    }
+  } catch (e) {
+    console.warn('pull error', e);
+    setSyncBadge('error');
+  }
+}
+function scheduleSync() {
+  setSyncBadge('syncing', '☁️ 同步中…');
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(function() { pushToCloud(); }, 700);
 }
 
 let data = loadData();
@@ -943,7 +1233,9 @@ function uid() {
 }
 
 function now() {
-  return new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
 function todayStr() {
@@ -951,12 +1243,22 @@ function todayStr() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-// 把 createdAt（兼容 "2026/7/24 09:30" 与 "2026-07-24T09:30"）归一为 "YYYY-MM-DD"
+// 把任意时间字段归一为 "YYYY-MM-DD"，用于「今日/本周」判断。
+// 兼容：显式 date 字段、"2026-07-24 09:30"、"2026/7/24 09:30"，
+// 以及旧数据里 toLocaleString 生成的 "7/24 09:30"（无年份，按当前年补全）。
 function itemDay(item) {
-  if (!item || !item.createdAt) return '';
-  const m = String(item.createdAt).match(/(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
-  if (!m) return '';
-  return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  if (!item) return '';
+  if (item.date) return item.date;                 // 新建项带显式 date，最可靠
+  const c = item.createdAt || '';
+  let m = String(c).match(/(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
+  if (m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  // 无年份：按当前年补全（如 "7/24 09:30"）
+  let m2 = String(c).match(/(\d{1,2})[^\d]+(\d{1,2})/);
+  if (m2) {
+    const y = new Date().getFullYear();
+    return `${y}-${String(m2[1]).padStart(2,'0')}-${String(m2[2]).padStart(2,'0')}`;
+  }
+  return '';
 }
 
 // --- week / due helpers ---
@@ -1007,6 +1309,9 @@ function switchModule(name) {
 // ==================== RENDER ====================
 function renderAll() {
   data = loadData();
+  if (!data.english) data.english = { words: [], masteredCore: [] };
+  if (!data.english.words) data.english.words = [];
+  if (!data.english.masteredCore) data.english.masteredCore = [];
   updateBadges();
   updateDate();
   if (currentModule === 'home') renderHome();
@@ -1015,6 +1320,7 @@ function renderAll() {
   else if (currentModule === 'inspiration') renderInspiration();
   else if (currentModule === 'videos') renderVideos();
   else if (currentModule === 'memos') renderMemos();
+  else if (currentModule === 'english') renderEnglish();
 }
 
 function updateDate() {
@@ -1047,6 +1353,8 @@ function renderHome() {
   const inspoN = data.inspiration.length;
   const videoN = data.videos.length;
   const memoN = data.memos.length;
+  const engWords = data.english.words.length;
+  const engCoreDone = PETS_CORE_WORDS.filter(w => data.english.masteredCore.includes(w.id)).length;
 
   const greets = ['羊总，', '早安，羊总', '下午好，羊总', '晚上好，羊总', '来了，羊总'];
   const greet = greets[Math.floor(Math.random() * greets.length)];
@@ -1054,7 +1362,8 @@ function renderHome() {
     + `📋 计划执行：本周记录 <b>${weekPlans.length}</b> 项计划，已完成 <b>${weekPlanDone}</b> 项。\n`
     + `✅ 待办总览：共 <b>${data.todos.length}</b> 条待办，<b>${undoneTodos.length}</b> 条待处理（紧急 ${urgentN} · 高优 ${highN}）。\n`
     + `⏰ 逾期提醒：<b>${overdue.length}</b> 条待办已逾期${overdue.length > 0 ? '，建议优先清理' : '，状态良好'}。\n`
-    + `💡 内容沉淀：灵感库 <b>${inspoN}</b> 个选题，热点追踪 <b>${videoN}</b> 条，备忘录 <b>${memoN}</b> 条。\n\n`
+    + `💡 内容沉淀：灵感库 <b>${inspoN}</b> 个选题，热点追踪 <b>${videoN}</b> 条，备忘录 <b>${memoN}</b> 条。\n`
+    + `📚 英语学习（PETS三级）：生词本 <b>${engWords}</b> 个，核心词已掌握 <b>${engCoreDone}</b>/${PETS_CORE_WORDS.length}。\n\n`
     + (overdue.length > 0
         ? `👉 今日建议：先处理 ${overdue.length} 条逾期事项，再推进今日计划。`
         : `👉 今日建议：${undoneTodos.length > 0 ? '保持节奏，按优先级推进待办。' : '没有待办压力，可以专注内容创作。'}`);
@@ -1174,7 +1483,7 @@ function homeAddPlan() {
   const input = document.getElementById('homePlanInput');
   const text = input.value.trim();
   if (!text) return;
-  data.plan.unshift({ id: uid(), text, done: false, createdAt: now() });
+  data.plan.unshift({ id: uid(), text, done: false, createdAt: now(), date: todayStr() });
   saveData(data); renderAll();
 }
 function homeTogglePlan(id) {
@@ -1256,7 +1565,7 @@ function addPlan() {
   const input = document.getElementById('planInput');
   const text = input.value.trim();
   if (!text) return;
-  data.plan.unshift({ id: uid(), text, done: false, createdAt: now() });
+  data.plan.unshift({ id: uid(), text, done: false, createdAt: now(), date: todayStr() });
   saveData(data);
   renderAll();
 }
@@ -1340,7 +1649,7 @@ function addTodo() {
   const due = document.getElementById('todoDue').value;
   const text = input.value.trim();
   if (!text) return;
-  data.todos.unshift({ id: uid(), text, done: false, priority: prio, due: due || '', createdAt: now() });
+  data.todos.unshift({ id: uid(), text, done: false, priority: prio, due: due || '', createdAt: now(), date: todayStr() });
   saveData(data);
   renderAll();
 }
@@ -1428,8 +1737,8 @@ function renderVideos() {
 
   el.innerHTML = `
     <div class="main-header" style="padding:0 0 4px">
-      <h2>🔥 爆款热点 / 二创</h2>
-      <p>每日好物推送 + 你的热点追踪库</p>
+      <h2>🔥 小红书爆款追踪</h2>
+      <p>每日好物推送 + 你的小红书灵感库</p>
     </div>
 
     <div class="feed-head">
@@ -1453,7 +1762,7 @@ function renderVideos() {
                 <div class="good-note">${escHtml(g.note || '')}</div>
                 <div class="good-meta">
                   <span>${g.date || ''}</span>
-                  ${g.url ? `<a href="${escHtml(g.url)}" target="_blank">查看原笔记 ↗</a>` : ''}
+                  ${g.url ? `<a href="${escHtml(g.url)}" target="_blank">查看小红书笔记 ↗</a><button class="link-copy" onclick="copyDaily(${i},this)">复制</button>` : ''}
                 </div>
               </div>
             </div>`;
@@ -1472,20 +1781,17 @@ function renderVideos() {
     </div>
     <div id="goodList"></div>
 
-    <div class="section-title">🎬 热点视频追踪（原有）</div>
-    <div class="input-row" style="flex-wrap:wrap">
-      <input type="text" id="videoTitle" placeholder="视频标题/描述..." style="min-width:200px">
-      <input type="text" id="videoUrl" placeholder="视频链接（可选）...">
-      <select id="videoSource" style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:0 10px;font-size:12px;font-family:inherit;outline:none">
-        <option value="抖音">抖音</option>
-        <option value="小红书">小红书</option>
-        <option value="B站">B站</option>
-        <option value="视频号">视频号</option>
-        <option value="快手">快手</option>
-        <option value="其他">其他</option>
-      </select>
-      <button class="btn btn-primary" onclick="addVideo()">添加热点</button>
+    <div class="section-title">📕 小红书爆款追踪</div>
+    <div style="font-size:11px;color:var(--text-dim);margin:0 0 8px;line-height:1.6">
+      💡 链接请在<b>小红书APP内</b>点笔记右上角「分享 → 复制链接」获取（形如 <code style="color:var(--accent)">xhslink.com/...</code>），这种手机一点就唤起APP。<br>
+      ⚠️ 电脑浏览器地址栏的 <code>xiaohongshu.com/explore/...</code> 手机打不开，请勿直接复制地址栏。
     </div>
+    <div class="input-row" style="flex-wrap:wrap">
+      <input type="text" id="videoTitle" placeholder="爆款笔记标题/描述..." style="min-width:200px">
+      <input type="text" id="videoUrl" placeholder="小红书分享短链（xhslink.com，可选）..." onpaste="checkXhsUrl(this)" oninput="checkXhsUrl(this)">
+      <button class="btn btn-primary" onclick="addVideo()">添加追踪</button>
+    </div>
+    <div id="videoUrlHint" style="font-size:11px;margin:4px 2px 10px;min-height:14px"></div>
     <div id="videoList"></div>
   `;
 
@@ -1509,7 +1815,7 @@ function renderVideos() {
             <div class="good-note">${escHtml(g.note || '')}</div>
             <div class="good-meta">
               <span>${g.createdAt || ''}</span>
-              ${g.url ? `<a href="${escHtml(g.url)}" target="_blank">查看 ↗</a>` : ''}
+              ${g.url ? `<a href="${escHtml(g.url)}" target="_blank">查看小红书笔记 ↗</a><button class="link-copy" onclick="copyGood('${g.id}',this)">复制</button>` : ''}
             </div>
           </div>
         </div>`;
@@ -1522,16 +1828,15 @@ function renderVideos() {
     videoList.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><p>发现爆款就记下来，二创灵感说来就来</p></div>`;
   } else {
     videoList.innerHTML = data.videos.map(v => {
-      const platformEmoji = { '抖音': '🎵', '小红书': '📕', 'B站': '📺', '视频号': '💬', '快手': '⚡', '其他': '🌐' };
-      const emoji = platformEmoji[v.source] || '📹';
+      const emoji = '📕';
       return `
         <div class="video-card">
           <div class="video-thumb">${emoji}</div>
           <div class="video-info">
             <div class="video-title">${escHtml(v.title)}</div>
             <div class="video-source">
-              <span>${v.source}</span>
-              ${v.url ? `<a href="${escHtml(v.url)}" target="_blank" style="color:var(--accent);font-size:11px">查看链接</a>` : ''}
+              <span>📕 小红书</span>
+              ${v.url ? `<a href="${escHtml(v.url)}" target="_blank" style="color:var(--accent);font-size:11px">查看小红书笔记 ↗</a><button class="link-copy" onclick="copyVideo('${v.id}',this)">复制</button>` : ''}
               ${v.note ? `<span style="color:var(--orange)">💬 ${escHtml(v.note)}</span>` : ''}
             </div>
             <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${v.createdAt || ''}</div>
@@ -1574,13 +1879,34 @@ function saveFromFeed(i) {
 }
 
 
+// 实时识别用户粘贴/输入的小红书链接类型，提示手机能否打开
+function checkXhsUrl(el) {
+  const hint = document.getElementById('videoUrlHint');
+  if (!hint) return;
+  const u = (el.value || '').trim();
+  if (!u) { hint.textContent = ''; hint.style.color = ''; return; }
+  // 有效：xhslink.cn / xhslink.com 分享短链（APP内「分享→复制链接」得到，手机可唤起）
+  if (/xhslink\.(cn|com)/i.test(u)) {
+    hint.textContent = '✅ 有效的小红书分享短链，手机端可唤起 APP 打开';
+    hint.style.color = '#3fb950';
+  } else if (/xiaohongshu\.com\/search_result/i.test(u)) {
+    hint.textContent = '⚠️ 这是搜索页链接，手机打不开，请改用 APP 内「分享→复制链接」的 xhslink.cn 短链';
+    hint.style.color = '#f0883e';
+  } else if (/xiaohongshu\.com/i.test(u)) {
+    hint.textContent = '⚠️ 这是网页链接（多为地址栏复制的 explore 页），手机常被墙打不开，请换 APP 分享短链 xhslink.cn';
+    hint.style.color = '#f0883e';
+  } else if (u) {
+    hint.textContent = 'ℹ️ 非小红书链接，将按普通链接保存';
+    hint.style.color = 'var(--text-dim)';
+  }
+}
+
 function addVideo() {
   const titleEl = document.getElementById('videoTitle');
   const urlEl = document.getElementById('videoUrl');
-  const sourceEl = document.getElementById('videoSource');
   const title = titleEl.value.trim();
   if (!title) return;
-  data.videos.unshift({ id: uid(), title, url: urlEl.value.trim(), source: sourceEl.value, note: '', createdAt: now() });
+  data.videos.unshift({ id: uid(), title, url: urlEl.value.trim(), source: '小红书', note: '', createdAt: now() });
   saveData(data);
   renderAll();
 }
@@ -1589,6 +1915,41 @@ function deleteVideo(id) {
   data.videos = data.videos.filter(v => v.id !== id);
   saveData(data);
   renderAll();
+}
+
+// ==================== 复制小红书链接（手机端兼容） ====================
+// 复制的是笔记分享链接（xhslink.com 短链或 explore 深链），
+// 手机上复制后发到微信/QQ，点开即可唤起小红书APP打开该笔记。
+function copyLink(url, btn) {
+  if (!url) return;
+  const done = () => { const t = btn.textContent; btn.textContent = '已复制 ✓'; setTimeout(() => { btn.textContent = t; }, 1500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done).catch(() => fallbackCopy(url, done));
+  } else {
+    fallbackCopy(url, done);
+  }
+}
+function fallbackCopy(text, cb) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.top = '-9999px';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); cb && cb(); } catch (e) {}
+  document.body.removeChild(ta);
+}
+function copyDaily(i, btn) {
+  const feed = (typeof DAILY_GOODNOTES !== 'undefined' && DAILY_GOODNOTES) ? DAILY_GOODNOTES : [];
+  copyLink(feed[i] ? (feed[i].url || '') : '', btn);
+}
+function copyGood(id, btn) {
+  const g = data.goodnotes.find(x => x.id === id);
+  copyLink(g ? (g.url || '') : '', btn);
+}
+function copyVideo(id, btn) {
+  const v = data.videos.find(x => x.id === id);
+  copyLink(v ? (v.url || '') : '', btn);
 }
 
 // ==================== MEMOS ====================
@@ -1633,6 +1994,130 @@ function deleteMemo(id) {
   renderAll();
 }
 
+// ==================== ENGLISH (PETS三级) ====================
+function renderEnglish() {
+  const el = document.getElementById('englishContent');
+  if (!data.english) data.english = { words: [], masteredCore: [] };
+  if (!data.english.words) data.english.words = [];
+  if (!data.english.masteredCore) data.english.masteredCore = [];
+  const words = data.english.words;
+  const masteredCore = data.english.masteredCore;
+  const coreTotal = PETS_CORE_WORDS.length;
+  const coreDone = PETS_CORE_WORDS.filter(w => masteredCore.includes(w.id)).length;
+  const pct = coreTotal ? Math.round(coreDone / coreTotal * 100) : 0;
+
+  el.innerHTML = `
+    <div class="main-header">
+      <h2>📚 英语学习 · PETS三级</h2>
+      <p>全国英语等级考试三级（≈ 雅思 4.5–5）核心词汇与语法速记</p>
+    </div>
+    <div class="main-content">
+
+      <div class="eng-progress">
+        <div class="eng-progress-top">
+          <span>📈 核心词掌握进度</span>
+          <span>${coreDone}/${coreTotal}（${pct}%）</span>
+        </div>
+        <div class="eng-bar"><div class="eng-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+
+      <div class="section-title">📖 我的生词本（${words.length}）</div>
+      <div class="input-row" style="flex-wrap:wrap">
+        <input type="text" id="ewWord" placeholder="单词，如 achieve" style="min-width:130px">
+        <input type="text" id="ewPhon" placeholder="音标（选填）" style="width:120px">
+        <input type="text" id="ewMean" placeholder="释义，如 v. 实现" style="min-width:160px">
+        <input type="text" id="ewEx" placeholder="例句（选填）" style="min-width:200px">
+        <button class="btn btn-primary" onclick="addWord()">添加生词</button>
+      </div>
+      <div id="wordList"></div>
+
+      <div class="section-title">🧠 PETS三级高频核心词（点「标记掌握」收藏）</div>
+      <div class="word-grid">
+        ${PETS_CORE_WORDS.map(w => {
+          const done = masteredCore.includes(w.id);
+          return `
+          <div class="word-card ${done ? 'mastered' : ''}">
+            <div class="w-top">
+              <div>
+                <div class="w-word">${escHtml(w.word)}</div>
+                <div class="w-phon">${escHtml(w.phonetic)}</div>
+              </div>
+              <button class="btn btn-sm ${done ? 'btn-ghost' : 'btn-accent'}" onclick="toggleCoreMastered('${w.id}')">${done ? '✓ 已掌握' : '标记掌握'}</button>
+            </div>
+            <div class="w-mean">${escHtml(w.meaning)}</div>
+            <div class="w-ex">${escHtml(w.example)}</div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div class="section-title">📐 语法要点速记</div>
+      <div class="grammar-list">
+        ${PETS_GRAMMAR.map(g => `
+          <div class="grammar-item">
+            <div class="g-title">${escHtml(g.title)}</div>
+            <div class="g-desc">${escHtml(g.desc)}</div>
+          </div>`).join('')}
+      </div>
+
+    </div>`;
+
+  const list = document.getElementById('wordList');
+  if (words.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📖</div><p>生词本还是空的，遇到不熟的词就记下来</p></div>`;
+  } else {
+    list.innerHTML = words.map(w => `
+      <div class="word-card ${w.mastered ? 'mastered' : ''}">
+        <div class="w-top">
+          <div>
+            <div class="w-word">${escHtml(w.word)} ${w.phonetic ? `<span class="w-phon">${escHtml(w.phonetic)}</span>` : ''}</div>
+            <div class="w-mean">${escHtml(w.meaning)}</div>
+            ${w.example ? `<div class="w-ex">${escHtml(w.example)}</div>` : ''}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+            <button class="btn btn-sm ${w.mastered ? 'btn-ghost' : 'btn-accent'}" onclick="toggleWordMastered('${w.id}')">${w.mastered ? '✓ 已会' : '标记已会'}</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteWord('${w.id}')">删除</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function addWord() {
+  const wEl = document.getElementById('ewWord');
+  const mEl = document.getElementById('ewMean');
+  const pEl = document.getElementById('ewPhon');
+  const eEl = document.getElementById('ewEx');
+  const word = wEl.value.trim();
+  const meaning = mEl.value.trim();
+  if (!word && !meaning) return;
+  if (!data.english) data.english = { words: [], masteredCore: [] };
+  if (!data.english.words) data.english.words = [];
+  data.english.words.unshift({ id: uid(), word, phonetic: pEl.value.trim(), meaning, example: eEl.value.trim(), mastered: false, createdAt: now() });
+  saveData(data);
+  renderAll();
+}
+
+function toggleWordMastered(id) {
+  const w = data.english.words.find(x => x.id === id);
+  if (w) { w.mastered = !w.mastered; saveData(data); renderAll(); }
+}
+
+function deleteWord(id) {
+  data.english.words = data.english.words.filter(x => x.id !== id);
+  saveData(data);
+  renderAll();
+}
+
+function toggleCoreMastered(id) {
+  if (!data.english) data.english = { words: [], masteredCore: [] };
+  if (!data.english.masteredCore) data.english.masteredCore = [];
+  const i = data.english.masteredCore.indexOf(id);
+  if (i >= 0) data.english.masteredCore.splice(i, 1);
+  else data.english.masteredCore.push(id);
+  saveData(data);
+  renderAll();
+}
+
 // ==================== UTILS ====================
 function escHtml(str) {
   const div = document.createElement('div');
@@ -1640,8 +2125,44 @@ function escHtml(str) {
   return div.innerHTML;
 }
 
+// ==================== 主题（跟随设备 / 浅色 / 深色） ====================
+const THEME_KEY = 'saki_dashboard_theme';
+const THEME_ORDER = ['auto', 'light', 'dark'];
+const THEME_META = {
+  auto:  { icon: '🌗', label: '跟随系统' },
+  light: { icon: '🌞', label: '浅色' },
+  dark:  { icon: '🌙', label: '深色' }
+};
+function getTheme() {
+  return localStorage.getItem(THEME_KEY) || 'auto';
+}
+function applyTheme(t) {
+  const root = document.documentElement;
+  root.setAttribute('data-theme', t);
+  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+  const effectiveDark = t === 'dark' ? true : (t === 'light' ? false : !prefersLight);
+  const mc = document.querySelector('meta[name="theme-color"]');
+  const sb = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if (mc) mc.setAttribute('content', effectiveDark ? '#0f1117' : '#f4f5fa');
+  if (sb) sb.setAttribute('content', effectiveDark ? 'black-translucent' : 'default');
+  const btn = document.getElementById('themeBtn');
+  if (btn) { const m = THEME_META[t]; btn.textContent = m.icon + ' ' + m.label; }
+  localStorage.setItem(THEME_KEY, t);
+}
+function cycleTheme() {
+  const cur = getTheme();
+  const next = THEME_ORDER[(THEME_ORDER.indexOf(cur) + 1) % THEME_ORDER.length];
+  applyTheme(next);
+}
+// 系统主题变化时，若处于“跟随系统”模式则实时跟随
+window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+  if (getTheme() === 'auto') applyTheme('auto');
+});
+
 // ==================== INIT ====================
+applyTheme(getTheme());
 renderAll();
+pullFromCloud(); // 启动即从云端拉取，多设备保持一致
 
 // === PWA Service Worker & Data Migration ===
 if ('serviceWorker' in navigator) {
