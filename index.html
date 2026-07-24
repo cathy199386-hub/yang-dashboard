@@ -1653,11 +1653,16 @@ function renderVideos() {
     <div id="goodList"></div>
 
     <div class="section-title">📕 小红书爆款追踪</div>
+    <div style="font-size:11px;color:var(--text-dim);margin:0 0 8px;line-height:1.6">
+      💡 链接请在<b>小红书APP内</b>点笔记右上角「分享 → 复制链接」获取（形如 <code style="color:var(--accent)">xhslink.com/...</code>），这种手机一点就唤起APP。<br>
+      ⚠️ 电脑浏览器地址栏的 <code>xiaohongshu.com/explore/...</code> 手机打不开，请勿直接复制地址栏。
+    </div>
     <div class="input-row" style="flex-wrap:wrap">
       <input type="text" id="videoTitle" placeholder="爆款笔记标题/描述..." style="min-width:200px">
-      <input type="text" id="videoUrl" placeholder="小红书笔记链接（xhslink.com，可选）...">
+      <input type="text" id="videoUrl" placeholder="小红书分享短链（xhslink.com，可选）..." onpaste="checkXhsUrl(this)" oninput="checkXhsUrl(this)">
       <button class="btn btn-primary" onclick="addVideo()">添加追踪</button>
     </div>
+    <div id="videoUrlHint" style="font-size:11px;margin:4px 2px 10px;min-height:14px"></div>
     <div id="videoList"></div>
   `;
 
@@ -1745,6 +1750,28 @@ function saveFromFeed(i) {
 }
 
 
+// 实时识别用户粘贴/输入的小红书链接类型，提示手机能否打开
+function checkXhsUrl(el) {
+  const hint = document.getElementById('videoUrlHint');
+  if (!hint) return;
+  const u = (el.value || '').trim();
+  if (!u) { hint.textContent = ''; hint.style.color = ''; return; }
+  // 有效：xhslink.cn / xhslink.com 分享短链（APP内「分享→复制链接」得到，手机可唤起）
+  if (/xhslink\.(cn|com)/i.test(u)) {
+    hint.textContent = '✅ 有效的小红书分享短链，手机端可唤起 APP 打开';
+    hint.style.color = '#3fb950';
+  } else if (/xiaohongshu\.com\/search_result/i.test(u)) {
+    hint.textContent = '⚠️ 这是搜索页链接，手机打不开，请改用 APP 内「分享→复制链接」的 xhslink.cn 短链';
+    hint.style.color = '#f0883e';
+  } else if (/xiaohongshu\.com/i.test(u)) {
+    hint.textContent = '⚠️ 这是网页链接（多为地址栏复制的 explore 页），手机常被墙打不开，请换 APP 分享短链 xhslink.cn';
+    hint.style.color = '#f0883e';
+  } else if (u) {
+    hint.textContent = 'ℹ️ 非小红书链接，将按普通链接保存';
+    hint.style.color = 'var(--text-dim)';
+  }
+}
+
 function addVideo() {
   const titleEl = document.getElementById('videoTitle');
   const urlEl = document.getElementById('videoUrl');
@@ -1762,8 +1789,8 @@ function deleteVideo(id) {
 }
 
 // ==================== 复制小红书链接（手机端兼容） ====================
-// 小红书手机网页版会"墙"起内容，链接点开只弹"打开APP"；
-// 加"复制"按钮，手机上复制到剪贴板后粘进小红书APP搜索即可直达。
+// 复制的是笔记分享链接（xhslink.com 短链或 explore 深链），
+// 手机上复制后发到微信/QQ，点开即可唤起小红书APP打开该笔记。
 function copyLink(url, btn) {
   if (!url) return;
   const done = () => { const t = btn.textContent; btn.textContent = '已复制 ✓'; setTimeout(() => { btn.textContent = t; }, 1500); };
