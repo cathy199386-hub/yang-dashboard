@@ -747,9 +747,41 @@ body {
 
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
-  .sidebar { display: none; }
+  body { flex-direction: column; }
+  .sidebar {
+    width: 100%;
+    min-width: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 10px 12px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 0 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-header .date { display: none; }
+  .sidebar-header > div:last-child { margin-top: 0; }
+  .nav-item {
+    width: auto;
+    flex: 0 0 auto;
+    margin: 3px 4px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  .nav-badge { margin-left: 6px; }
+  .main-header { padding: 16px 16px 0; }
+  .main-content { padding: 16px; }
   .overview-grid { grid-template-columns: 1fr; }
   .inspiration-grid { grid-template-columns: 1fr; }
+  .feed-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
