@@ -512,6 +512,29 @@ body {
 .good-note { font-size: 11.5px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 10px; flex: 1; }
 .good-meta { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
 .good-meta a { color: var(--accent); text-decoration: none; }
+
+/* ===== 英语学习 PETS三级 ===== */
+.eng-progress { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px; }
+.eng-progress-top { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text-dim); margin-bottom: 8px; }
+.eng-progress-top span:last-child { color: var(--accent); font-weight: 600; }
+.eng-bar { height: 8px; background: var(--bg-input); border-radius: 99px; overflow: hidden; }
+.eng-bar-fill { height: 100%; background: linear-gradient(90deg, #7c5cff, #b0666d); border-radius: 99px; transition: width .3s ease; }
+.word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; margin-top: 12px; }
+.word-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+.word-card.mastered { opacity: .5; }
+.word-card .w-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.word-card .w-word { font-size: 16px; font-weight: 700; color: var(--text); }
+.word-card .w-phon { color: var(--text-dim); font-size: 12px; margin-top: 2px; }
+.word-card .w-mean { color: var(--text-dim); font-size: 13px; margin-top: 6px; }
+.word-card .w-ex { color: var(--accent); font-size: 12px; margin-top: 6px; font-style: italic; }
+.grammar-list { margin-top: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.grammar-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; }
+.grammar-item .g-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.grammar-item .g-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.6; }
+.btn-accent { background: linear-gradient(90deg, #7c5cff, #b0666d); color: #fff; border: none; }
+.btn-accent:hover { filter: brightness(1.08); }
+.btn-ghost { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+
 .link-copy {
   margin-left: 8px;
   background: transparent;
@@ -894,6 +917,9 @@ body {
   <button class="nav-item" data-module="memos">
     <span class="icon">📝</span> 备忘录
   </button>
+  <button class="nav-item" data-module="english">
+    <span class="icon">📚</span> 英语学习
+  </button>
 </aside>
 
 <!-- ==================== MAIN ==================== -->
@@ -949,6 +975,11 @@ body {
     <div class="main-content" id="memoContent"></div>
   </div>
 
+  <!-- ENGLISH -->
+  <div class="module" id="module-english">
+    <div id="englishContent"></div>
+  </div>
+
 </main>
 
 <script>
@@ -1001,6 +1032,48 @@ const DAILY_GOODNOTES = [
   }
 ];
 
+// ==================== PETS三级 英语学习（静态词库 / 语法库） ====================
+// PETS = 全国英语等级考试（Public English Test System）。三级 ≈ 雅思 4.5–5 / 高于高考。
+const PETS_CORE_WORDS = [
+  { id: 'w01', word: 'achieve',     phonetic: '/əˈtʃiːv/',     meaning: 'v. 实现，取得，达到', example: 'She achieved her dream of becoming a doctor.' },
+  { id: 'w02', word: 'complain',    phonetic: '/kəmˈpleɪn/',    meaning: 'v. 抱怨，投诉', example: 'He complained about the noisy neighbors.' },
+  { id: 'w03', word: 'deliberate',  phonetic: '/dɪˈlɪbərət/',  meaning: 'adj. 故意的；从容的', example: 'It was a deliberate mistake to test us.' },
+  { id: 'w04', word: 'enormous',    phonetic: '/ɪˈnɔːməs/',    meaning: 'adj. 巨大的，庞大的', example: 'They spent an enormous amount of money.' },
+  { id: 'w05', word: 'facility',    phonetic: '/fəˈsɪləti/',    meaning: 'n. 设施，设备；场所', example: 'The hotel has excellent sports facilities.' },
+  { id: 'w06', word: 'genuine',     phonetic: '/ˈdʒenjuɪn/',   meaning: 'adj. 真正的，真诚的', example: 'She showed genuine concern for the victims.' },
+  { id: 'w07', word: 'hesitate',    phonetic: '/ˈhezɪteɪt/',    meaning: 'v. 犹豫，迟疑', example: 'Don\'t hesitate to ask for help.' },
+  { id: 'w08', word: 'illustrate',   phonetic: '/ˈɪləstreɪt/',   meaning: 'v. 说明，阐明；加插图', example: 'The chart illustrates the trend clearly.' },
+  { id: 'w09', word: 'neglect',     phonetic: '/nɪˈɡlekt/',     meaning: 'v. 忽视，疏忽', example: 'He neglected his health during that period.' },
+  { id: 'w10', word: 'obstacle',    phonetic: '/ˈɒbstəkl/',     meaning: 'n. 障碍，妨碍', example: 'Poverty is a major obstacle to education.' },
+  { id: 'w11', word: 'profound',    phonetic: '/prəˈfaʊnd/',    meaning: 'adj. 深刻的，深远的', example: 'The book had a profound influence on me.' },
+  { id: 'w12', word: 'reluctant',   phonetic: '/rɪˈlʌktənt/',  meaning: 'adj. 不情愿的，勉强的', example: 'She was reluctant to leave her hometown.' },
+  { id: 'w13', word: 'sustainable', phonetic: '/səˈsteɪnəbl/', meaning: 'adj. 可持续的', example: 'We need sustainable development.' },
+  { id: 'w14', word: 'transparent', phonetic: '/trænsˈpærənt/', meaning: 'adj. 透明的；清澈的', example: 'The company must be transparent about costs.' },
+  { id: 'w15', word: 'virtually',   phonetic: '/ˈvɜːtʃuəli/',  meaning: 'adv. 几乎，事实上', example: 'The project is virtually complete.' },
+  { id: 'w16', word: 'worthwhile',  phonetic: '/ˌwɜːθˈwaɪl/', meaning: 'adj. 值得做的，有价值的', example: 'It was a worthwhile experience.' },
+  { id: 'w17', word: 'abandon',     phonetic: '/əˈbændən/',     meaning: 'v. 放弃，抛弃', example: 'They had to abandon the plan.' },
+  { id: 'w18', word: 'accumulate',  phonetic: '/əˈkjuːmjəleɪt/', meaning: 'v. 积累，积聚', example: 'He accumulated a lot of wealth.' },
+  { id: 'w19', word: 'anticipate',  phonetic: '/ænˈtɪsɪpeɪt/', meaning: 'v. 预料，期望', example: 'We anticipate a rise in prices.' },
+  { id: 'w20', word: 'circumstance', phonetic: '/ˈsɜːkəmstæns/', meaning: 'n. 情况，环境', example: 'Under no circumstances should you give up.' },
+  { id: 'w21', word: 'distribute',  phonetic: '/dɪˈstrɪbjuːt/', meaning: 'v. 分配，分发', example: 'The books were distributed to students.' },
+  { id: 'w22', word: 'emphasis',    phonetic: '/ˈemfəsɪs/',     meaning: 'n. 强调，重点', example: 'The course puts emphasis on speaking.' },
+  { id: 'w23', word: 'fundamental', phonetic: '/ˌfʌndəˈmentl/', meaning: 'adj. 基本的，根本的', example: 'Trust is fundamental to friendship.' },
+  { id: 'w24', word: 'nevertheless', phonetic: '/ˌnevərðəˈles/', meaning: 'adv. 然而，不过', example: 'He was tired; nevertheless he kept working.' }
+];
+
+const PETS_GRAMMAR = [
+  { title: '虚拟语气', desc: 'if 引导的非真实条件句：与现在/过去事实相反，主从句谓语形式各退一格。' },
+  { title: '非谓语动词', desc: '不定式、动名词、分词作主语/宾语/定语/状语/补语，注意主动被动与完成式。' },
+  { title: '定语从句', desc: '关系代词 who/which/that/whom/whose 及关系副词 where/when/why；注意限制性与非限制性。' },
+  { title: '名词性从句', desc: '主语从句、宾语从句、表语从句、同位语从句；引导词 that / whether / what 等。' },
+  { title: '时态呼应', desc: '主从句时态一致；客观真理、常态不受主句过去时影响。' },
+  { title: '倒装句', desc: '否定词前置（never, hardly, not only, no sooner）引起部分倒装。' },
+  { title: '强调句型', desc: 'It is / was + 被强调部分 + that / who + 其余部分。' },
+  { title: '被动语态', desc: 'be + 过去分词；注意各时态被动式及 get + 过去分词结构。' },
+  { title: '比较结构', desc: 'as...as, not so...as, the more...the more, 及倍数表达。' },
+  { title: '情态动词表推测', desc: 'must（一定）、can\'t（不可能）、may/might（可能）对现在/过去的推测。' }
+];
+
 function loadData() {
   try {
     const v1 = JSON.parse(localStorage.getItem(STORE_KEY));
@@ -1013,6 +1086,7 @@ function loadData() {
       merged.videos = v1.videos || [];
       merged.memos = v1.memos || [];
       merged.goodnotes = v1.goodnotes || [];
+      merged.english = v1.english || merged.english;
     }
     if (v2) {
       merged.plan = v2.plan || merged.plan;
@@ -1021,6 +1095,7 @@ function loadData() {
       merged.videos = v2.videos || merged.videos;
       merged.memos = v2.memos || merged.memos;
       merged.goodnotes = v2.goodnotes || merged.goodnotes;
+      merged.english = v2.english || merged.english;
     }
     return merged;
   } catch {
@@ -1040,7 +1115,11 @@ function getDefaultData() {
     inspiration: [], // { id, title, desc, tag, createdAt }
     videos: [],      // { id, title, url, source, note, createdAt }
     memos: [],       // { id, text, createdAt }
-    goodnotes: []    // { id, title, tags[], cover, url, note, createdAt }
+    goodnotes: [],   // { id, title, tags[], cover, url, note, createdAt }
+    english: {       // 英语学习（PETS三级）
+      words: [],              // 生词本 { id, word, phonetic, meaning, example, mastered, createdAt }
+      masteredCore: []        // 已掌握的核心词 id 列表
+    }
   };
 }
 
@@ -1230,6 +1309,9 @@ function switchModule(name) {
 // ==================== RENDER ====================
 function renderAll() {
   data = loadData();
+  if (!data.english) data.english = { words: [], masteredCore: [] };
+  if (!data.english.words) data.english.words = [];
+  if (!data.english.masteredCore) data.english.masteredCore = [];
   updateBadges();
   updateDate();
   if (currentModule === 'home') renderHome();
@@ -1238,6 +1320,7 @@ function renderAll() {
   else if (currentModule === 'inspiration') renderInspiration();
   else if (currentModule === 'videos') renderVideos();
   else if (currentModule === 'memos') renderMemos();
+  else if (currentModule === 'english') renderEnglish();
 }
 
 function updateDate() {
@@ -1270,6 +1353,8 @@ function renderHome() {
   const inspoN = data.inspiration.length;
   const videoN = data.videos.length;
   const memoN = data.memos.length;
+  const engWords = data.english.words.length;
+  const engCoreDone = PETS_CORE_WORDS.filter(w => data.english.masteredCore.includes(w.id)).length;
 
   const greets = ['羊总，', '早安，羊总', '下午好，羊总', '晚上好，羊总', '来了，羊总'];
   const greet = greets[Math.floor(Math.random() * greets.length)];
@@ -1277,7 +1362,8 @@ function renderHome() {
     + `📋 计划执行：本周记录 <b>${weekPlans.length}</b> 项计划，已完成 <b>${weekPlanDone}</b> 项。\n`
     + `✅ 待办总览：共 <b>${data.todos.length}</b> 条待办，<b>${undoneTodos.length}</b> 条待处理（紧急 ${urgentN} · 高优 ${highN}）。\n`
     + `⏰ 逾期提醒：<b>${overdue.length}</b> 条待办已逾期${overdue.length > 0 ? '，建议优先清理' : '，状态良好'}。\n`
-    + `💡 内容沉淀：灵感库 <b>${inspoN}</b> 个选题，热点追踪 <b>${videoN}</b> 条，备忘录 <b>${memoN}</b> 条。\n\n`
+    + `💡 内容沉淀：灵感库 <b>${inspoN}</b> 个选题，热点追踪 <b>${videoN}</b> 条，备忘录 <b>${memoN}</b> 条。\n`
+    + `📚 英语学习（PETS三级）：生词本 <b>${engWords}</b> 个，核心词已掌握 <b>${engCoreDone}</b>/${PETS_CORE_WORDS.length}。\n\n`
     + (overdue.length > 0
         ? `👉 今日建议：先处理 ${overdue.length} 条逾期事项，再推进今日计划。`
         : `👉 今日建议：${undoneTodos.length > 0 ? '保持节奏，按优先级推进待办。' : '没有待办压力，可以专注内容创作。'}`);
@@ -1904,6 +1990,130 @@ function addMemo() {
 
 function deleteMemo(id) {
   data.memos = data.memos.filter(m => m.id !== id);
+  saveData(data);
+  renderAll();
+}
+
+// ==================== ENGLISH (PETS三级) ====================
+function renderEnglish() {
+  const el = document.getElementById('englishContent');
+  if (!data.english) data.english = { words: [], masteredCore: [] };
+  if (!data.english.words) data.english.words = [];
+  if (!data.english.masteredCore) data.english.masteredCore = [];
+  const words = data.english.words;
+  const masteredCore = data.english.masteredCore;
+  const coreTotal = PETS_CORE_WORDS.length;
+  const coreDone = PETS_CORE_WORDS.filter(w => masteredCore.includes(w.id)).length;
+  const pct = coreTotal ? Math.round(coreDone / coreTotal * 100) : 0;
+
+  el.innerHTML = `
+    <div class="main-header">
+      <h2>📚 英语学习 · PETS三级</h2>
+      <p>全国英语等级考试三级（≈ 雅思 4.5–5）核心词汇与语法速记</p>
+    </div>
+    <div class="main-content">
+
+      <div class="eng-progress">
+        <div class="eng-progress-top">
+          <span>📈 核心词掌握进度</span>
+          <span>${coreDone}/${coreTotal}（${pct}%）</span>
+        </div>
+        <div class="eng-bar"><div class="eng-bar-fill" style="width:${pct}%"></div></div>
+      </div>
+
+      <div class="section-title">📖 我的生词本（${words.length}）</div>
+      <div class="input-row" style="flex-wrap:wrap">
+        <input type="text" id="ewWord" placeholder="单词，如 achieve" style="min-width:130px">
+        <input type="text" id="ewPhon" placeholder="音标（选填）" style="width:120px">
+        <input type="text" id="ewMean" placeholder="释义，如 v. 实现" style="min-width:160px">
+        <input type="text" id="ewEx" placeholder="例句（选填）" style="min-width:200px">
+        <button class="btn btn-primary" onclick="addWord()">添加生词</button>
+      </div>
+      <div id="wordList"></div>
+
+      <div class="section-title">🧠 PETS三级高频核心词（点「标记掌握」收藏）</div>
+      <div class="word-grid">
+        ${PETS_CORE_WORDS.map(w => {
+          const done = masteredCore.includes(w.id);
+          return `
+          <div class="word-card ${done ? 'mastered' : ''}">
+            <div class="w-top">
+              <div>
+                <div class="w-word">${escHtml(w.word)}</div>
+                <div class="w-phon">${escHtml(w.phonetic)}</div>
+              </div>
+              <button class="btn btn-sm ${done ? 'btn-ghost' : 'btn-accent'}" onclick="toggleCoreMastered('${w.id}')">${done ? '✓ 已掌握' : '标记掌握'}</button>
+            </div>
+            <div class="w-mean">${escHtml(w.meaning)}</div>
+            <div class="w-ex">${escHtml(w.example)}</div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      <div class="section-title">📐 语法要点速记</div>
+      <div class="grammar-list">
+        ${PETS_GRAMMAR.map(g => `
+          <div class="grammar-item">
+            <div class="g-title">${escHtml(g.title)}</div>
+            <div class="g-desc">${escHtml(g.desc)}</div>
+          </div>`).join('')}
+      </div>
+
+    </div>`;
+
+  const list = document.getElementById('wordList');
+  if (words.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📖</div><p>生词本还是空的，遇到不熟的词就记下来</p></div>`;
+  } else {
+    list.innerHTML = words.map(w => `
+      <div class="word-card ${w.mastered ? 'mastered' : ''}">
+        <div class="w-top">
+          <div>
+            <div class="w-word">${escHtml(w.word)} ${w.phonetic ? `<span class="w-phon">${escHtml(w.phonetic)}</span>` : ''}</div>
+            <div class="w-mean">${escHtml(w.meaning)}</div>
+            ${w.example ? `<div class="w-ex">${escHtml(w.example)}</div>` : ''}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
+            <button class="btn btn-sm ${w.mastered ? 'btn-ghost' : 'btn-accent'}" onclick="toggleWordMastered('${w.id}')">${w.mastered ? '✓ 已会' : '标记已会'}</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteWord('${w.id}')">删除</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function addWord() {
+  const wEl = document.getElementById('ewWord');
+  const mEl = document.getElementById('ewMean');
+  const pEl = document.getElementById('ewPhon');
+  const eEl = document.getElementById('ewEx');
+  const word = wEl.value.trim();
+  const meaning = mEl.value.trim();
+  if (!word && !meaning) return;
+  if (!data.english) data.english = { words: [], masteredCore: [] };
+  if (!data.english.words) data.english.words = [];
+  data.english.words.unshift({ id: uid(), word, phonetic: pEl.value.trim(), meaning, example: eEl.value.trim(), mastered: false, createdAt: now() });
+  saveData(data);
+  renderAll();
+}
+
+function toggleWordMastered(id) {
+  const w = data.english.words.find(x => x.id === id);
+  if (w) { w.mastered = !w.mastered; saveData(data); renderAll(); }
+}
+
+function deleteWord(id) {
+  data.english.words = data.english.words.filter(x => x.id !== id);
+  saveData(data);
+  renderAll();
+}
+
+function toggleCoreMastered(id) {
+  if (!data.english) data.english = { words: [], masteredCore: [] };
+  if (!data.english.masteredCore) data.english.masteredCore = [];
+  const i = data.english.masteredCore.indexOf(id);
+  if (i >= 0) data.english.masteredCore.splice(i, 1);
+  else data.english.masteredCore.push(id);
   saveData(data);
   renderAll();
 }
