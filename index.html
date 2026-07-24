@@ -1099,7 +1099,9 @@ function uid() {
 }
 
 function now() {
-  return new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
 function todayStr() {
@@ -1107,12 +1109,22 @@ function todayStr() {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
-// 把 createdAt（兼容 "2026/7/24 09:30" 与 "2026-07-24T09:30"）归一为 "YYYY-MM-DD"
+// 把任意时间字段归一为 "YYYY-MM-DD"，用于「今日/本周」判断。
+// 兼容：显式 date 字段、"2026-07-24 09:30"、"2026/7/24 09:30"，
+// 以及旧数据里 toLocaleString 生成的 "7/24 09:30"（无年份，按当前年补全）。
 function itemDay(item) {
-  if (!item || !item.createdAt) return '';
-  const m = String(item.createdAt).match(/(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
-  if (!m) return '';
-  return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  if (!item) return '';
+  if (item.date) return item.date;                 // 新建项带显式 date，最可靠
+  const c = item.createdAt || '';
+  let m = String(c).match(/(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
+  if (m) return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  // 无年份：按当前年补全（如 "7/24 09:30"）
+  let m2 = String(c).match(/(\d{1,2})[^\d]+(\d{1,2})/);
+  if (m2) {
+    const y = new Date().getFullYear();
+    return `${y}-${String(m2[1]).padStart(2,'0')}-${String(m2[2]).padStart(2,'0')}`;
+  }
+  return '';
 }
 
 // --- week / due helpers ---
@@ -1330,7 +1342,7 @@ function homeAddPlan() {
   const input = document.getElementById('homePlanInput');
   const text = input.value.trim();
   if (!text) return;
-  data.plan.unshift({ id: uid(), text, done: false, createdAt: now() });
+  data.plan.unshift({ id: uid(), text, done: false, createdAt: now(), date: todayStr() });
   saveData(data); renderAll();
 }
 function homeTogglePlan(id) {
@@ -1412,7 +1424,7 @@ function addPlan() {
   const input = document.getElementById('planInput');
   const text = input.value.trim();
   if (!text) return;
-  data.plan.unshift({ id: uid(), text, done: false, createdAt: now() });
+  data.plan.unshift({ id: uid(), text, done: false, createdAt: now(), date: todayStr() });
   saveData(data);
   renderAll();
 }
@@ -1496,7 +1508,7 @@ function addTodo() {
   const due = document.getElementById('todoDue').value;
   const text = input.value.trim();
   if (!text) return;
-  data.todos.unshift({ id: uid(), text, done: false, priority: prio, due: due || '', createdAt: now() });
+  data.todos.unshift({ id: uid(), text, done: false, priority: prio, due: due || '', createdAt: now(), date: todayStr() });
   saveData(data);
   renderAll();
 }
