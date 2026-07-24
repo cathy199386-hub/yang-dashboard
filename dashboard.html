@@ -1,0 +1,1677 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="羊总工作台">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch.png">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<title>羊总工作台</title>
+<style>
+:root {
+  --bg: #0f1117;
+  --bg-sidebar: #161822;
+  --bg-card: #1a1d2e;
+  --bg-hover: #222538;
+  --bg-input: #12141f;
+  --border: #2a2d3e;
+  --text: #e1e4ed;
+  --text-secondary: #8b8fa8;
+  --text-muted: #5c6078;
+  --accent: #6c8cff;
+  --accent-glow: rgba(108, 140, 255, 0.15);
+  --green: #4ecb71;
+  --orange: #f0a050;
+  --red: #f55c7a;
+  --purple: #a78bfa;
+  --cyan: #38bdf8;
+  --pink: #f472b6;
+  --radius: 10px;
+  --radius-sm: 6px;
+  --transition: 0.2s ease;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ========== SIDEBAR ========== */
+.sidebar {
+  width: 240px;
+  min-width: 240px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+}
+
+.sidebar-header {
+  padding: 0 20px 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.sidebar-header .logo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.5px;
+}
+
+.sidebar-header .date {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  margin: 1px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 13.5px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  background: none;
+  width: calc(100% - 20px);
+  text-align: left;
+}
+
+.nav-item:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.nav-item.active {
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+.nav-item .icon {
+  font-size: 16px;
+  width: 22px;
+  text-align: center;
+}
+
+.nav-badge {
+  margin-left: auto;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* ========== MAIN ========== */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.main-header {
+  padding: 20px 28px 0;
+  flex-shrink: 0;
+}
+
+.main-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.main-header p {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 28px 28px;
+}
+
+.main-content::-webkit-scrollbar {
+  width: 5px;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+/* ========== CARDS ========== */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  transition: var(--transition);
+}
+
+.card:hover {
+  border-color: #3a3d52;
+}
+
+/* ========== INPUT ========== */
+.input-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.input-row input,
+.input-row textarea {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  font-family: inherit;
+  transition: var(--transition);
+}
+
+.input-row input:focus,
+.input-row textarea:focus {
+  border-color: var(--accent);
+}
+
+.input-row textarea {
+  resize: vertical;
+  min-height: 36px;
+  max-height: 80px;
+}
+
+.btn {
+  padding: 8px 18px;
+  border-radius: var(--radius-sm);
+  border: none;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.15);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--red);
+  border: 1px solid transparent;
+  font-size: 11px;
+  padding: 3px 8px;
+}
+
+.btn-danger:hover {
+  background: rgba(245, 92, 122, 0.1);
+  border-color: rgba(245, 92, 122, 0.3);
+}
+
+.btn-sm {
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+/* ========== TODO ITEMS ========== */
+.todo-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 6px;
+  transition: var(--transition);
+}
+
+.todo-item:hover {
+  border-color: #3a3d52;
+}
+
+.todo-item.done .todo-text {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.todo-checkbox {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  transition: var(--transition);
+}
+
+.todo-item.done .todo-checkbox {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.todo-item.done .todo-checkbox::after {
+  content: '✓';
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.todo-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.todo-text {
+  font-size: 13.5px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.todo-meta {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.todo-actions {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.todo-item:hover .todo-actions {
+  opacity: 1;
+}
+
+/* ========== INSPIRATION CARDS ========== */
+.inspiration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.inspo-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  position: relative;
+  transition: var(--transition);
+}
+
+.inspo-card:hover {
+  border-color: #3a3d52;
+  transform: translateY(-1px);
+}
+
+.inspo-tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.tag-idea { background: rgba(108, 140, 255, 0.15); color: var(--accent); }
+.tag-hot { background: rgba(245, 92, 122, 0.15); color: var(--red); }
+.tag-draft { background: rgba(240, 160, 80, 0.15); color: var(--orange); }
+.tag-done { background: rgba(78, 203, 113, 0.15); color: var(--green); }
+
+.inspo-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.inspo-desc {
+  font-size: 12.5px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.inspo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ========== VIDEO CARDS ========== */
+.video-card {
+  display: flex;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  transition: var(--transition);
+}
+
+.video-card:hover {
+  border-color: #3a3d52;
+}
+
+/* ========== DAILY GOODNOTES (每日好物) ========== */
+.feed-head {
+  display: flex; align-items: center; gap: 8px;
+  margin: 20px 0 12px;
+}
+.feed-head:first-of-type { margin-top: 4px; }
+.feed-head .ft { font-size: 14px; font-weight: 700; color: var(--text); }
+.feed-head .fd { font-size: 11px; color: var(--text-muted); margin-left: auto; }
+.feed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(205px, 1fr));
+  gap: 12px;
+}
+.good-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: var(--transition);
+}
+.good-card:hover { border-color: #3a3d52; transform: translateY(-2px); }
+.good-cover {
+  height: 116px; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 44px;
+}
+.good-cover .plat {
+  position: absolute; top: 8px; left: 8px;
+  font-size: 10px; padding: 2px 8px; border-radius: 999px;
+  background: rgba(0,0,0,.4); color: #fff;
+}
+.good-cover .plus {
+  position: absolute; top: 8px; right: 8px;
+  font-size: 11px; padding: 3px 9px; border-radius: 999px;
+  background: rgba(0,0,0,.4); color: #fff; cursor: pointer;
+  border: none; font-family: inherit; line-height: 1; text-decoration: none;
+}
+.good-cover .plus:hover { background: rgba(0,0,0,.65); }
+.good-body { padding: 11px 13px 13px; display: flex; flex-direction: column; flex: 1; }
+.good-title { font-size: 13px; font-weight: 600; line-height: 1.45; margin-bottom: 8px; }
+.good-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+.good-tag {
+  font-size: 10.5px; padding: 2px 8px; border-radius: 999px;
+  background: rgba(108,140,255,.12); color: var(--accent);
+}
+.good-note { font-size: 11.5px; color: var(--text-secondary); line-height: 1.55; margin-bottom: 10px; flex: 1; }
+.good-meta { display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: var(--text-muted); }
+.good-meta a { color: var(--accent); text-decoration: none; }
+
+.video-thumb {
+  width: 100px;
+  height: 66px;
+  min-width: 100px;
+  background: var(--bg-hover);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: var(--text-muted);
+  overflow: hidden;
+}
+
+.video-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.video-title {
+  font-size: 13.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.video-source {
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.video-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ========== MEMO ========== */
+.memo-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  transition: var(--transition);
+}
+
+.memo-card:hover {
+  border-color: #3a3d52;
+  border-left-color: var(--accent);
+}
+
+.memo-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.memo-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+}
+
+/* ========== MODULE: HIDDEN ========== */
+.module {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+}
+
+.module.active {
+  display: flex;
+}
+
+/* ========== EMPTY STATE ========== */
+.empty-state {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state .empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  font-size: 13px;
+}
+
+/* ========== SECTION ========== */
+.section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin: 20px 0 10px;
+}
+.section-title:first-child {
+  margin-top: 0;
+}
+
+/* ========== STATS BAR ========== */
+.stats-bar {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-box {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ========== OVERVIEW ========== */
+.overview-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.overview-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.overview-card h4 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mini-todo {
+  font-size: 12.5px;
+  padding: 5px 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.mini-todo:last-child {
+  border-bottom: none;
+}
+
+.mini-inspo {
+  font-size: 12.5px;
+  padding: 5px 0;
+  color: var(--text-secondary);
+}
+
+.overview-link {
+  font-size: 11px;
+  color: var(--accent);
+  cursor: pointer;
+  margin-top: 8px;
+  display: inline-block;
+}
+
+.overview-link:hover {
+  text-decoration: underline;
+}
+
+/* ========== HOME PAGE ========== */
+.home-section {
+  margin-bottom: 18px;
+}
+.home-section-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.home-section-title .hs-badge {
+  font-size: 11px;
+  color: var(--accent);
+  background: var(--accent-glow);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+/* AI report */
+.ai-report {
+  background: linear-gradient(135deg, #1a1d2e, #20243a);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+.ai-report-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.ai-report-head .ar-title {
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ai-refresh {
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  transition: var(--transition);
+}
+.ai-refresh:hover { background: var(--border); color: var(--text); }
+.report-text {
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  white-space: pre-wrap;
+}
+.report-text b { color: var(--text); }
+
+/* Segmented control */
+.seg-control {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 3px;
+  margin-bottom: 12px;
+}
+.seg-btn {
+  flex: 1;
+  border: none;
+  background: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 7px 4px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  transition: var(--transition);
+}
+.seg-btn:hover { color: var(--text); }
+.seg-btn.active {
+  background: var(--bg-card);
+  color: var(--accent);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.seg-btn .seg-count {
+  font-size: 10px;
+  opacity: 0.7;
+  margin-left: 3px;
+}
+
+/* ========== RESPONSIVE ========== */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .overview-grid { grid-template-columns: 1fr; }
+  .inspiration-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ==================== SIDEBAR ==================== -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="logo">⚡ 羊总工作台</div>
+    <div class="date" id="sidebarDate"></div>
+    <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+      <button class="btn btn-sm" onclick="exportData()" title="导出数据为JSON">⬇️ 导出</button>
+      <button class="btn btn-sm" onclick="document.getElementById('importFile').click()" title="从JSON导入数据">⬆️ 导入</button>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none" onchange="importData(this.files[0])">
+    </div>
+  </div>
+  <button class="nav-item active" data-module="home">
+    <span class="icon">🏠</span> 首页
+  </button>
+  <button class="nav-item" data-module="plan">
+    <span class="icon">📋</span> 今日计划
+    <span class="nav-badge" id="planBadge">0</span>
+  </button>
+  <button class="nav-item" data-module="todos">
+    <span class="icon">✅</span> 全部待办
+    <span class="nav-badge" id="todoBadge">0</span>
+  </button>
+  <button class="nav-item" data-module="inspiration">
+    <span class="icon">💡</span> 选题灵感
+  </button>
+  <button class="nav-item" data-module="videos">
+    <span class="icon">🔥</span> 爆款热点
+  </button>
+  <button class="nav-item" data-module="memos">
+    <span class="icon">📝</span> 备忘录
+  </button>
+</aside>
+
+<!-- ==================== MAIN ==================== -->
+<main class="main">
+
+  <!-- HOME -->
+  <div class="module active" id="module-home">
+    <div class="main-content" id="homeContent"></div>
+  </div>
+
+  <!-- TODAY'S PLAN -->
+  <div class="module" id="module-plan">
+    <div class="main-header">
+      <h2>📋 今日计划</h2>
+      <p>专注今天要做的事</p>
+    </div>
+    <div class="main-content" id="planContent"></div>
+  </div>
+
+  <!-- ALL TODOS -->
+  <div class="module" id="module-todos">
+    <div class="main-header">
+      <h2>✅ 全部待办</h2>
+      <p>所有待办事项一览</p>
+    </div>
+    <div class="main-content" id="todoContent"></div>
+  </div>
+
+  <!-- INSPIRATION -->
+  <div class="module" id="module-inspiration">
+    <div class="main-header">
+      <h2>💡 选题每日灵感</h2>
+      <p>内容创作的点子库</p>
+    </div>
+    <div class="main-content" id="inspirationContent"></div>
+  </div>
+
+  <!-- HOT VIDEOS -->
+  <div class="module" id="module-videos">
+    <div class="main-header">
+      <h2>🔥 爆款热点视频 / 二创</h2>
+      <p>追踪热点，激发二创灵感</p>
+    </div>
+    <div class="main-content" id="videoContent"></div>
+  </div>
+
+  <!-- MEMOS -->
+  <div class="module" id="module-memos">
+    <div class="main-header">
+      <h2>📝 备忘录</h2>
+      <p>随手记，不丢失</p>
+    </div>
+    <div class="main-content" id="memoContent"></div>
+  </div>
+
+</main>
+
+<script>
+// ==================== DATA STORE ====================
+const STORE_KEY = 'saki_dashboard_data';
+
+// ==================== 每日好物推送（由 Saki 每日自动抓取更新，独立于 localStorage） ====================
+const DAILY_GOODNOTES = [
+  {
+    title: '挂件气垫席卷包挂圈：美妆正在变配饰',
+    tags: ['美妆', '包挂', '通勤', '种草'],
+    cover: '', url: 'https://www.163.com/dy/article/L1TFT8N80519L83M.html',
+    note: '#挂件气垫 搜索同比暴涨11600%，带链条挂饰美妆一年热度涨86%；Rhode 唇釉手机壳上线25分钟抢空。',
+    date: '2026-07-24'
+  },
+  {
+    title: '复古有线耳机逆袭出圈，成千禧风配饰',
+    tags: ['数码配饰', '复古', 'Y2K', '平价'],
+    cover: '', url: 'https://www.toutiao.com/article/7664875584283918867',
+    note: '小红书「有线耳机穿搭」笔记超10万篇；马卡龙色系19.9–59.9元卖爆，大学生/上班族主力。',
+    date: '2026-07-24'
+  },
+  {
+    title: '蝴蝶猫眼水钻穿戴甲，指尖赛博朋克',
+    tags: ['美甲', '穿戴甲', '手工', '辣妹'],
+    cover: '', url: 'https://beaut.taobao.com/topic/meijiagongju_9/9646f7dd2b02219ce504a4ba744972a8.html',
+    note: '小红书爆款手工甲片，M/XS码通用，一贴即美，日常通勤到派对都能hold。',
+    date: '2026-07-24'
+  },
+  {
+    title: '红石榴山茶花沐浴露，大容量持久留香',
+    tags: ['洗护', '留香', '居家', '性价比'],
+    cover: '', url: 'https://beaut.taobao.com/topic/zhuanti/%E7%BA%A2%E4%B9%A6%E6%8E%A8%E8%8D%90/',
+    note: '以高容量、持久留香、强效滋润俘获用户，小红书高赞居家囤货刚需。',
+    date: '2026-07-24'
+  },
+  {
+    title: 'OPPO 联名坚果 P3S，躺平式投影仪',
+    tags: ['数码', '投影', '露营', '居家'],
+    cover: '', url: 'https://www.dh3g.com/youxi-110899',
+    note: '450ANSI流明，镜头90°旋转可投天花板，反向充电，保温杯大小便携露营。',
+    date: '2026-07-24'
+  },
+  {
+    title: '牛郎眼影单色盘，通勤珠光必入',
+    tags: ['美妆', '眼影', '通勤', '珠光'],
+    cover: '', url: '',
+    note: '被无数美妆博主种草的细闪单色眼影盘，细腻珠光带来灵动眼妆，懒人通勤神器。',
+    date: '2026-07-24'
+  }
+];
+
+function loadData() {
+  try {
+    const v1 = JSON.parse(localStorage.getItem(STORE_KEY));
+    const v2 = JSON.parse(localStorage.getItem('saki_dashboard_v2'));
+    const merged = getDefaultData();
+    if (v1) {
+      merged.plan = v1.plan || [];
+      merged.todos = v1.todos || [];
+      merged.inspiration = v1.inspiration || [];
+      merged.videos = v1.videos || [];
+      merged.memos = v1.memos || [];
+      merged.goodnotes = v1.goodnotes || [];
+    }
+    if (v2) {
+      merged.plan = v2.plan || merged.plan;
+      merged.todos = v2.todos || merged.todos;
+      merged.inspiration = v2.inspiration || merged.inspiration;
+      merged.videos = v2.videos || merged.videos;
+      merged.memos = v2.memos || merged.memos;
+      merged.goodnotes = v2.goodnotes || merged.goodnotes;
+    }
+    return merged;
+  } catch {
+    return getDefaultData();
+  }
+}
+
+function saveData(data) {
+  localStorage.setItem(STORE_KEY, JSON.stringify(data));
+}
+
+function getDefaultData() {
+  return {
+    plan: [],        // { id, text, done, createdAt }
+    todos: [],       // { id, text, done, priority, createdAt, due }
+    inspiration: [], // { id, title, desc, tag, createdAt }
+    videos: [],      // { id, title, url, source, note, createdAt }
+    memos: [],       // { id, text, createdAt }
+    goodnotes: []    // { id, title, tags[], cover, url, note, createdAt }
+  };
+}
+
+let data = loadData();
+let currentModule = 'home';
+
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+}
+
+function now() {
+  return new Date().toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// 把 createdAt（兼容 "2026/7/24 09:30" 与 "2026-07-24T09:30"）归一为 "YYYY-MM-DD"
+function itemDay(item) {
+  if (!item || !item.createdAt) return '';
+  const m = String(item.createdAt).match(/(\d{4})[^\d]+(\d{1,2})[^\d]+(\d{1,2})/);
+  if (!m) return '';
+  return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+}
+
+// --- week / due helpers ---
+function getWeekStart() {
+  const d = new Date();
+  const day = d.getDay(); // 0=Sunday
+  const diff = (day === 0) ? -6 : 1 - day; // Monday start
+  const ws = new Date(d);
+  ws.setDate(d.getDate() + diff);
+  return ws.toISOString().slice(0,10);
+}
+function getWeekEnd() {
+  const ws = getWeekStart();
+  const we = new Date(ws);
+  we.setDate(we.getDate() + 6);
+  return we.toISOString().slice(0,10);
+}
+function isThisWeek(dateStr) {
+  if (!dateStr) return false;
+  const ws = getWeekStart(), we = getWeekEnd();
+  return dateStr >= ws && dateStr <= we;
+}
+function getOverdue() {
+  const today = todayStr();
+  return data.todos.filter(t => !t.done && t.due && t.due < today);
+}
+function fmtDateShort(s) {
+  if (!s) return '';
+  return s.slice(5).replace('-', '/'); // MM/DD
+}
+
+// ==================== NAVIGATION ====================
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    switchModule(item.dataset.module);
+  });
+});
+
+function switchModule(name) {
+  currentModule = name;
+  document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+  document.querySelector(`[data-module="${name}"]`)?.classList.add('active');
+  document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+  document.getElementById(`module-${name}`)?.classList.add('active');
+  renderAll();
+}
+
+// ==================== RENDER ====================
+function renderAll() {
+  data = loadData();
+  updateBadges();
+  updateDate();
+  if (currentModule === 'home') renderHome();
+  else if (currentModule === 'plan') renderPlan();
+  else if (currentModule === 'todos') renderTodos();
+  else if (currentModule === 'inspiration') renderInspiration();
+  else if (currentModule === 'videos') renderVideos();
+  else if (currentModule === 'memos') renderMemos();
+}
+
+function updateDate() {
+  const d = new Date();
+  const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+  document.getElementById('sidebarDate').textContent =
+    `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 星期${weekdays[d.getDay()]}`;
+}
+
+function updateBadges() {
+  const planUndone = data.plan.filter(t => !t.done).length;
+  const todoUndone = data.todos.filter(t => !t.done).length;
+  document.getElementById('planBadge').textContent = planUndone;
+  document.getElementById('todoBadge').textContent = todoUndone;
+}
+
+// ==================== HOME ====================
+function renderHome() {
+  const el = document.getElementById('homeContent');
+  const today = todayStr();
+
+  // ---- 每日AI简报 ----
+  const ws = getWeekStart(), we = getWeekEnd();
+  const weekPlans = data.plan.filter(t => itemDay(t) >= ws);
+  const weekPlanDone = weekPlans.filter(t => t.done).length;
+  const undoneTodos = data.todos.filter(t => !t.done);
+  const urgentN = undoneTodos.filter(t => t.priority === 'urgent').length;
+  const highN = undoneTodos.filter(t => t.priority === 'high').length;
+  const overdue = getOverdue();
+  const inspoN = data.inspiration.length;
+  const videoN = data.videos.length;
+  const memoN = data.memos.length;
+
+  const greets = ['羊总，', '早安，羊总', '下午好，羊总', '晚上好，羊总', '来了，羊总'];
+  const greet = greets[Math.floor(Math.random() * greets.length)];
+  const report = `${greet}这是你本周（${fmtDateShort(ws)} ~ ${fmtDateShort(we)}）的工作简报：\n\n`
+    + `📋 计划执行：本周记录 <b>${weekPlans.length}</b> 项计划，已完成 <b>${weekPlanDone}</b> 项。\n`
+    + `✅ 待办总览：共 <b>${data.todos.length}</b> 条待办，<b>${undoneTodos.length}</b> 条待处理（紧急 ${urgentN} · 高优 ${highN}）。\n`
+    + `⏰ 逾期提醒：<b>${overdue.length}</b> 条待办已逾期${overdue.length > 0 ? '，建议优先清理' : '，状态良好'}。\n`
+    + `💡 内容沉淀：灵感库 <b>${inspoN}</b> 个选题，热点追踪 <b>${videoN}</b> 条，备忘录 <b>${memoN}</b> 条。\n\n`
+    + (overdue.length > 0
+        ? `👉 今日建议：先处理 ${overdue.length} 条逾期事项，再推进今日计划。`
+        : `👉 今日建议：${undoneTodos.length > 0 ? '保持节奏，按优先级推进待办。' : '没有待办压力，可以专注内容创作。'}`);
+
+  // ---- 今日计划 ----
+  const planToday = data.plan.filter(t => itemDay(t) === today);
+  const planDone = planToday.filter(t => t.done).length;
+  let planHtml = `
+    <div class="home-section">
+      <div class="home-section-title">📋 今日计划 <span class="hs-badge">${planDone}/${planToday.length}</span></div>
+      <div class="input-row">
+        <input type="text" id="homePlanInput" placeholder="今天要做什么？" onkeydown="if(event.key==='Enter')homeAddPlan()">
+        <button class="btn btn-primary" onclick="homeAddPlan()">添加</button>
+      </div>
+      <div id="homePlanList"></div>
+    </div>
+  `;
+  // ---- 待办四视图 ----
+  const segToday = data.todos.filter(t => !t.done && (t.due === today || (!t.due && itemDay(t) === today)));
+  const segWeek = data.todos.filter(t => !t.done && isThisWeek(t.due) && t.due !== today && t.due > today);
+  const segOver = getOverdue();
+  const segAll = data.todos;
+
+  let todoHtml = `
+    <div class="home-section">
+      <div class="home-section-title">✅ 全部待办 <span class="hs-badge">${undoneTodos.length} 待处理</span>
+        <span style="margin-left:auto;font-size:11px;color:var(--text-muted);cursor:pointer" onclick="switchModule('todos')">去管理 →</span>
+      </div>
+      <div class="seg-control" id="homeSeg">
+        <button class="seg-btn active" data-seg="today" onclick="switchHomeSeg('today')">今日 <span class="seg-count">${segToday.length}</span></button>
+        <button class="seg-btn" data-seg="week" onclick="switchHomeSeg('week')">本周 <span class="seg-count">${segWeek.length}</span></button>
+        <button class="seg-btn" data-seg="over" onclick="switchHomeSeg('over')">逾期 <span class="seg-count">${segOver.length}</span></button>
+        <button class="seg-btn" data-seg="all" onclick="switchHomeSeg('all')">全部 <span class="seg-count">${segAll.length}</span></button>
+      </div>
+      <div id="homeSegList"></div>
+    </div>
+  `;
+
+  el.innerHTML = `
+    <div class="home-section">
+      <div class="ai-report">
+        <div class="ai-report-head">
+          <div class="ar-title">🤖 每日AI简报</div>
+          <button class="ai-refresh" onclick="renderHome()">↻ 重新生成</button>
+        </div>
+        <div class="report-text">${report}</div>
+      </div>
+    </div>
+    ${planHtml}
+    ${todoHtml}
+  `;
+
+  // render plan list
+  const planList = document.getElementById('homePlanList');
+  if (planToday.length === 0) {
+    planList.innerHTML = `<div class="empty-state" style="padding:24px"><p>今天还没有计划，开始规划吧</p></div>`;
+  } else {
+    planList.innerHTML = planToday.map(t => `
+      <div class="todo-item ${t.done ? 'done' : ''}">
+        <div class="todo-checkbox" onclick="homeTogglePlan('${t.id}')"></div>
+        <div class="todo-content">
+          <div class="todo-text">${escHtml(t.text)}</div>
+          <div class="todo-meta">${t.createdAt?.split(' ')[1] || ''}</div>
+        </div>
+        <div class="todo-actions">
+          <button class="btn btn-danger" onclick="homeDeletePlan('${t.id}')">删除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // render default seg
+  renderHomeSeg('today');
+}
+
+function renderHomeSeg(seg) {
+  const today = todayStr();
+  let list;
+  if (seg === 'today') list = data.todos.filter(t => !t.done && (t.due === today || (!t.due && itemDay(t) === today)));
+  else if (seg === 'week') list = data.todos.filter(t => !t.done && isThisWeek(t.due) && t.due !== today && t.due > today);
+  else if (seg === 'over') list = getOverdue();
+  else list = data.todos;
+
+  const el = document.getElementById('homeSegList');
+  if (!el) return;
+  if (list.length === 0) {
+    el.innerHTML = `<div class="empty-state" style="padding:24px"><p>这里暂无待办</p></div>`;
+    return;
+  }
+  el.innerHTML = list.map(t => {
+    const overdue = t.due && t.due < today && !t.done;
+    const prio = t.priority === 'urgent' ? '🔴 紧急' : t.priority === 'high' ? '🟡 高优' : '';
+    const dueLabel = t.due ? (overdue ? `⚠️ 逾期 ${fmtDateShort(t.due)}` : `📅 ${fmtDateShort(t.due)}`) : '';
+    return `
+      <div class="todo-item ${t.done ? 'done' : ''}" ${overdue ? 'style="border-color:rgba(245,92,122,0.4)"' : ''}>
+        <div class="todo-checkbox" onclick="homeToggleTodo('${t.id}')"></div>
+        <div class="todo-content">
+          <div class="todo-text">${escHtml(t.text)}</div>
+          <div class="todo-meta">${[prio, dueLabel].filter(Boolean).join(' · ') || t.createdAt || ''}</div>
+        </div>
+        <div class="todo-actions">
+          <button class="btn btn-danger" onclick="homeDeleteTodo('${t.id}')">删除</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function switchHomeSeg(seg) {
+  document.querySelectorAll('#homeSeg .seg-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector(`#homeSeg .seg-btn[data-seg="${seg}"]`)?.classList.add('active');
+  renderHomeSeg(seg);
+}
+
+// home plan handlers
+function homeAddPlan() {
+  const input = document.getElementById('homePlanInput');
+  const text = input.value.trim();
+  if (!text) return;
+  data.plan.unshift({ id: uid(), text, done: false, createdAt: now() });
+  saveData(data); renderAll();
+}
+function homeTogglePlan(id) {
+  const item = data.plan.find(t => t.id === id);
+  if (item) { item.done = !item.done; saveData(data); renderAll(); }
+}
+function homeDeletePlan(id) {
+  data.plan = data.plan.filter(t => t.id !== id);
+  saveData(data); renderAll();
+}
+function homeToggleTodo(id) {
+  const item = data.todos.find(t => t.id === id);
+  if (item) { item.done = !item.done; saveData(data); renderAll(); }
+}
+function homeDeleteTodo(id) {
+  data.todos = data.todos.filter(t => t.id !== id);
+  saveData(data); renderAll();
+}
+
+// ==================== PLAN ====================
+function renderPlan() {
+  const el = document.getElementById('planContent');
+  const today = todayStr();
+  let planToday = data.plan.filter(t => {
+    return itemDay(t) === today;
+  });
+
+  el.innerHTML = `
+    <div class="input-row">
+      <input type="text" id="planInput" placeholder="添加今天的计划..." onkeydown="if(event.key==='Enter')addPlan()">
+      <button class="btn btn-primary" onclick="addPlan()">添加</button>
+    </div>
+    <div id="planList"></div>
+    ${data.plan.filter(t => itemDay(t) !== today).length > 0 ? `
+      <div class="section-title">历史计划</div>
+      <div id="planHistory"></div>
+    ` : ''}
+  `;
+
+  // Today's plans
+  const planList = document.getElementById('planList');
+  if (planToday.length === 0) {
+    planList.innerHTML = `<div class="empty-state"><div class="empty-icon">📋</div><p>今天还没有计划，开始规划吧</p></div>`;
+  } else {
+    planList.innerHTML = planToday.map(t => `
+      <div class="todo-item ${t.done ? 'done' : ''}">
+        <div class="todo-checkbox" onclick="togglePlan('${t.id}')"></div>
+        <div class="todo-content">
+          <div class="todo-text">${escHtml(t.text)}</div>
+          <div class="todo-meta">${t.createdAt?.split(' ')[1] || ''}</div>
+        </div>
+        <div class="todo-actions">
+          <button class="btn btn-danger" onclick="deletePlan('${t.id}')">删除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  // History
+  const planHistory = document.getElementById('planHistory');
+  if (planHistory) {
+    const history = data.plan.filter(t => itemDay(t) !== today);
+    planHistory.innerHTML = history.map(t => `
+      <div class="todo-item ${t.done ? 'done' : ''}">
+        <div class="todo-checkbox" style="cursor:default; opacity:0.5"></div>
+        <div class="todo-content">
+          <div class="todo-text">${escHtml(t.text)}</div>
+          <div class="todo-meta">${t.createdAt || ''}</div>
+        </div>
+        <div class="todo-actions">
+          <button class="btn btn-danger" onclick="deletePlan('${t.id}')">删除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function addPlan() {
+  const input = document.getElementById('planInput');
+  const text = input.value.trim();
+  if (!text) return;
+  data.plan.unshift({ id: uid(), text, done: false, createdAt: now() });
+  saveData(data);
+  renderAll();
+}
+
+function togglePlan(id) {
+  const item = data.plan.find(t => t.id === id);
+  if (item) { item.done = !item.done; saveData(data); renderAll(); }
+}
+
+function deletePlan(id) {
+  data.plan = data.plan.filter(t => t.id !== id);
+  saveData(data);
+  renderAll();
+}
+
+// ==================== TODOS ====================
+function renderTodos() {
+  const el = document.getElementById('todoContent');
+  const undone = data.todos.filter(t => !t.done);
+  const done = data.todos.filter(t => t.done);
+
+  el.innerHTML = `
+    <div class="input-row">
+      <input type="text" id="todoInput" placeholder="添加新待办..." onkeydown="if(event.key==='Enter')addTodo()">
+      <select id="todoPriority" style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:0 10px;font-size:12px;font-family:inherit;outline:none">
+        <option value="normal">普通</option>
+        <option value="high">高优</option>
+        <option value="urgent">紧急</option>
+      </select>
+      <input type="date" id="todoDue" title="截止日期（可选）" style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:0 10px;font-size:12px;font-family:inherit;outline:none">
+      <button class="btn btn-primary" onclick="addTodo()">添加</button>
+    </div>
+    <div class="section-title">待处理 (${undone.length})</div>
+    <div id="todoUndoneList"></div>
+    ${done.length > 0 ? `<div class="section-title">已完成 (${done.length})</div><div id="todoDoneList"></div>` : ''}
+  `;
+
+  const undoneList = document.getElementById('todoUndoneList');
+  if (undone.length === 0) {
+    undoneList.innerHTML = `<div class="empty-state"><p>🎉 所有待办都已清完！</p></div>`;
+  } else {
+    undoneList.innerHTML = undone.map(t => {
+      const prioLabel = t.priority === 'urgent' ? '🔴 紧急' : t.priority === 'high' ? '🟡 高优' : '';
+      const overdue = t.due && t.due < todayStr();
+      const dueLabel = t.due ? (overdue ? `⚠️ 逾期 ${fmtDateShort(t.due)}` : `📅 ${fmtDateShort(t.due)}`) : '';
+      return `
+        <div class="todo-item ${t.done ? 'done' : ''}" ${overdue ? 'style="border-color:rgba(245,92,122,0.4)"' : ''}>
+          <div class="todo-checkbox" onclick="toggleTodo('${t.id}')"></div>
+          <div class="todo-content">
+            <div class="todo-text">${escHtml(t.text)}</div>
+            <div class="todo-meta">${[prioLabel, dueLabel].filter(Boolean).join(' · ') || t.createdAt || ''}</div>
+          </div>
+          <div class="todo-actions">
+            <button class="btn btn-danger" onclick="deleteTodo('${t.id}')">删除</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  const doneList = document.getElementById('todoDoneList');
+  if (doneList) {
+    doneList.innerHTML = done.map(t => `
+      <div class="todo-item done">
+        <div class="todo-checkbox" onclick="toggleTodo('${t.id}')"></div>
+        <div class="todo-content">
+          <div class="todo-text">${escHtml(t.text)}</div>
+          <div class="todo-meta">${t.createdAt || ''}</div>
+        </div>
+        <div class="todo-actions">
+          <button class="btn btn-danger" onclick="deleteTodo('${t.id}')">删除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function addTodo() {
+  const input = document.getElementById('todoInput');
+  const prio = document.getElementById('todoPriority').value;
+  const due = document.getElementById('todoDue').value;
+  const text = input.value.trim();
+  if (!text) return;
+  data.todos.unshift({ id: uid(), text, done: false, priority: prio, due: due || '', createdAt: now() });
+  saveData(data);
+  renderAll();
+}
+
+function toggleTodo(id) {
+  const item = data.todos.find(t => t.id === id);
+  if (item) { item.done = !item.done; saveData(data); renderAll(); }
+}
+
+function deleteTodo(id) {
+  data.todos = data.todos.filter(t => t.id !== id);
+  saveData(data);
+  renderAll();
+}
+
+// ==================== INSPIRATION ====================
+function renderInspiration() {
+  const el = document.getElementById('inspirationContent');
+  el.innerHTML = `
+    <div class="input-row" style="flex-wrap:wrap">
+      <input type="text" id="inspoTitle" placeholder="灵感标题..." style="min-width:200px">
+      <input type="text" id="inspoDesc" placeholder="简要描述...">
+      <select id="inspoTag" style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:0 10px;font-size:12px;font-family:inherit;outline:none">
+        <option value="idea">💡 创意</option>
+        <option value="hot">🔥 热点</option>
+        <option value="draft">✏️ 草稿</option>
+      </select>
+      <button class="btn btn-primary" onclick="addInspiration()">记录灵感</button>
+    </div>
+    <div class="inspiration-grid" id="inspoGrid"></div>
+  `;
+
+  const grid = document.getElementById('inspoGrid');
+  if (data.inspiration.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><div class="empty-icon">💡</div><p>灵感来了就记下来，好记性不如烂笔头</p></div>`;
+  } else {
+    grid.innerHTML = data.inspiration.map(i => {
+      const tagClass = `tag-${i.tag || 'idea'}`;
+      const tagLabel = i.tag === 'hot' ? '🔥 热点' : i.tag === 'draft' ? '✏️ 草稿' : '💡 创意';
+      return `
+        <div class="inspo-card">
+          <span class="inspo-tag ${tagClass}">${tagLabel}</span>
+          <div class="inspo-title">${escHtml(i.title)}</div>
+          <div class="inspo-desc">${escHtml(i.desc || '')}</div>
+          <div class="inspo-footer">
+            <span>${i.createdAt || ''}</span>
+            <button class="btn btn-danger" onclick="deleteInspiration('${i.id}')">删除</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+function addInspiration() {
+  const titleEl = document.getElementById('inspoTitle');
+  const descEl = document.getElementById('inspoDesc');
+  const tagEl = document.getElementById('inspoTag');
+  const title = titleEl.value.trim();
+  if (!title) return;
+  data.inspiration.unshift({ id: uid(), title, desc: descEl.value.trim(), tag: tagEl.value, createdAt: now() });
+  saveData(data);
+  renderAll();
+}
+
+function deleteInspiration(id) {
+  data.inspiration = data.inspiration.filter(i => i.id !== id);
+  saveData(data);
+  renderAll();
+}
+
+// ==================== VIDEOS ====================
+function renderVideos() {
+  const el = document.getElementById('videoContent');
+  const feed = (typeof DAILY_GOODNOTES !== 'undefined' && DAILY_GOODNOTES) ? DAILY_GOODNOTES : [];
+  const feedDate = feed.length ? (feed[0].date || '') : '';
+  const gradients = [
+    'linear-gradient(135deg,#ff9a9e,#fad0c4)',
+    'linear-gradient(135deg,#a18cd1,#fbc2eb)',
+    'linear-gradient(135deg,#84fab0,#8fd3f4)',
+    'linear-gradient(135deg,#f6d365,#fda085)',
+    'linear-gradient(135deg,#5ee7df,#b490ca)',
+    'linear-gradient(135deg,#f093fb,#f5576c)'
+  ];
+
+  el.innerHTML = `
+    <div class="main-header" style="padding:0 0 4px">
+      <h2>🔥 爆款热点 / 二创</h2>
+      <p>每日好物推送 + 你的热点追踪库</p>
+    </div>
+
+    <div class="feed-head">
+      <span class="ft">📕 每日好物推送</span>
+      <span class="fd">${feedDate ? '更新于 ' + feedDate : '由 Saki 每日自动抓取'}</span>
+    </div>
+    ${feed.length === 0
+      ? '<div class="empty-state"><div class="empty-icon">📭</div><p>今日好物推送还没更新</p></div>'
+      : '<div class="feed-grid">' + feed.map((g, i) => {
+          const cov = g.cover || '';
+          const bg = cov ? `background:url('${escHtml(cov)}') center/cover` : `background:${gradients[i % gradients.length]}`;
+          return `
+            <div class="good-card">
+              <div class="good-cover" style="${bg}">
+                <span class="plat">📕 小红书</span>
+                <button class="plus" onclick="saveFromFeed(${i})">+ 收藏</button>
+              </div>
+              <div class="good-body">
+                <div class="good-title">${escHtml(g.title)}</div>
+                <div class="good-tags">${(g.tags || []).map(t => `<span class="good-tag">#${escHtml(t)}</span>`).join('')}</div>
+                <div class="good-note">${escHtml(g.note || '')}</div>
+                <div class="good-meta">
+                  <span>${g.date || ''}</span>
+                  ${g.url ? `<a href="${escHtml(g.url)}" target="_blank">查看原笔记 ↗</a>` : ''}
+                </div>
+              </div>
+            </div>`;
+        }).join('') + '</div>'
+    }
+
+    <div class="feed-head">
+      <span class="ft">⭐ 我的好物收藏</span>
+      <span class="fd">手动记录 · 点推送卡片右上角 + 一键转存</span>
+    </div>
+    <div class="input-row" style="flex-wrap:wrap">
+      <input type="text" id="goodTitle" placeholder="好物名称..." style="min-width:160px">
+      <input type="text" id="goodTags" placeholder="标签，逗号分隔..." style="min-width:140px">
+      <input type="text" id="goodUrl" placeholder="笔记链接（可选）...">
+      <button class="btn btn-primary" onclick="addGoodnote()">收藏好物</button>
+    </div>
+    <div id="goodList"></div>
+
+    <div class="section-title">🎬 热点视频追踪（原有）</div>
+    <div class="input-row" style="flex-wrap:wrap">
+      <input type="text" id="videoTitle" placeholder="视频标题/描述..." style="min-width:200px">
+      <input type="text" id="videoUrl" placeholder="视频链接（可选）...">
+      <select id="videoSource" style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);padding:0 10px;font-size:12px;font-family:inherit;outline:none">
+        <option value="抖音">抖音</option>
+        <option value="小红书">小红书</option>
+        <option value="B站">B站</option>
+        <option value="视频号">视频号</option>
+        <option value="快手">快手</option>
+        <option value="其他">其他</option>
+      </select>
+      <button class="btn btn-primary" onclick="addVideo()">添加热点</button>
+    </div>
+    <div id="videoList"></div>
+  `;
+
+  // 我的好物收藏
+  const goodList = document.getElementById('goodList');
+  if (data.goodnotes.length === 0) {
+    goodList.innerHTML = `<div class="empty-state"><div class="empty-icon">🛍️</div><p>把看中的好物收进来</p></div>`;
+  } else {
+    goodList.innerHTML = '<div class="feed-grid">' + data.goodnotes.map((g, i) => {
+      const cov = g.cover || '';
+      const bg = cov ? `background:url('${escHtml(cov)}') center/cover` : `background:${gradients[(i + 3) % gradients.length]}`;
+      return `
+        <div class="good-card">
+          <div class="good-cover" style="${bg}">
+            <span class="plat">⭐ 收藏</span>
+            <button class="plus" onclick="deleteGoodnote('${g.id}')">✕</button>
+          </div>
+          <div class="good-body">
+            <div class="good-title">${escHtml(g.title)}</div>
+            <div class="good-tags">${(g.tags || []).map(t => `<span class="good-tag">#${escHtml(t)}</span>`).join('')}</div>
+            <div class="good-note">${escHtml(g.note || '')}</div>
+            <div class="good-meta">
+              <span>${g.createdAt || ''}</span>
+              ${g.url ? `<a href="${escHtml(g.url)}" target="_blank">查看 ↗</a>` : ''}
+            </div>
+          </div>
+        </div>`;
+    }).join('') + '</div>';
+  }
+
+  // 原有视频列表
+  const videoList = document.getElementById('videoList');
+  if (data.videos.length === 0) {
+    videoList.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><p>发现爆款就记下来，二创灵感说来就来</p></div>`;
+  } else {
+    videoList.innerHTML = data.videos.map(v => {
+      const platformEmoji = { '抖音': '🎵', '小红书': '📕', 'B站': '📺', '视频号': '💬', '快手': '⚡', '其他': '🌐' };
+      const emoji = platformEmoji[v.source] || '📹';
+      return `
+        <div class="video-card">
+          <div class="video-thumb">${emoji}</div>
+          <div class="video-info">
+            <div class="video-title">${escHtml(v.title)}</div>
+            <div class="video-source">
+              <span>${v.source}</span>
+              ${v.url ? `<a href="${escHtml(v.url)}" target="_blank" style="color:var(--accent);font-size:11px">查看链接</a>` : ''}
+              ${v.note ? `<span style="color:var(--orange)">💬 ${escHtml(v.note)}</span>` : ''}
+            </div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">${v.createdAt || ''}</div>
+          </div>
+          <div class="video-actions">
+            <button class="btn btn-danger" onclick="deleteVideo('${v.id}')">删除</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+function addGoodnote() {
+  const tEl = document.getElementById('goodTitle');
+  const gEl = document.getElementById('goodTags');
+  const uEl = document.getElementById('goodUrl');
+  const title = tEl.value.trim();
+  if (!title) return;
+  const tags = gEl.value.split(/[,，]/).map(s => s.trim()).filter(Boolean);
+  data.goodnotes.unshift({ id: uid(), title, tags, cover: '', url: uEl.value.trim(), note: '', createdAt: now() });
+  saveData(data);
+  renderAll();
+}
+
+function deleteGoodnote(id) {
+  data.goodnotes = data.goodnotes.filter(g => g.id !== id);
+  saveData(data);
+  renderAll();
+}
+
+function saveFromFeed(i) {
+  const feed = (typeof DAILY_GOODNOTES !== 'undefined' && DAILY_GOODNOTES) ? DAILY_GOODNOTES : [];
+  const g = feed[i];
+  if (!g) return;
+  if (data.goodnotes.some(x => x.title === g.title)) return; // 已收藏则不重复
+  data.goodnotes.unshift({ id: uid(), title: g.title, tags: g.tags || [], cover: g.cover || '', url: g.url || '', note: g.note || '', createdAt: now() });
+  saveData(data);
+  renderAll();
+}
+
+
+function addVideo() {
+  const titleEl = document.getElementById('videoTitle');
+  const urlEl = document.getElementById('videoUrl');
+  const sourceEl = document.getElementById('videoSource');
+  const title = titleEl.value.trim();
+  if (!title) return;
+  data.videos.unshift({ id: uid(), title, url: urlEl.value.trim(), source: sourceEl.value, note: '', createdAt: now() });
+  saveData(data);
+  renderAll();
+}
+
+function deleteVideo(id) {
+  data.videos = data.videos.filter(v => v.id !== id);
+  saveData(data);
+  renderAll();
+}
+
+// ==================== MEMOS ====================
+function renderMemos() {
+  const el = document.getElementById('memoContent');
+  el.innerHTML = `
+    <div class="input-row">
+      <textarea id="memoInput" placeholder="写点什么..." rows="2" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();addMemo()}"></textarea>
+      <button class="btn btn-primary" onclick="addMemo()" style="align-self:flex-end">保存</button>
+    </div>
+    <div id="memoList"></div>
+  `;
+
+  const list = document.getElementById('memoList');
+  if (data.memos.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">📝</div><p>还没有备忘录，随手记点什么吧</p></div>`;
+  } else {
+    list.innerHTML = data.memos.map(m => `
+      <div class="memo-card">
+        <div class="memo-text">${escHtml(m.text)}</div>
+        <div class="memo-time">${m.createdAt || ''}</div>
+        <div style="margin-top:8px">
+          <button class="btn btn-danger" onclick="deleteMemo('${m.id}')">删除</button>
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function addMemo() {
+  const input = document.getElementById('memoInput');
+  const text = input.value.trim();
+  if (!text) return;
+  data.memos.unshift({ id: uid(), text, createdAt: now() });
+  saveData(data);
+  renderAll();
+}
+
+function deleteMemo(id) {
+  data.memos = data.memos.filter(m => m.id !== id);
+  saveData(data);
+  renderAll();
+}
+
+// ==================== UTILS ====================
+function escHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ==================== INIT ====================
+renderAll();
+
+// === PWA Service Worker & Data Migration ===
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(function(e) { console.log('SW:', e); });
+  });
+}
+
+function exportData() {
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'yang-dashboard-' + todayStr() + '.json';
+  a.click();
+}
+
+function importData(file) {
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var imported = JSON.parse(e.target.result);
+      data = Object.assign(getDefaultData(), imported);
+      saveData(data);
+      renderAll();
+      alert('导入成功！已合并 ' + Object.keys(imported).length + ' 类数据');
+    } catch(err) { alert('导入失败：文件格式不正确'); }
+  };
+  reader.readAsText(file);
+}
+</script>
+</body>
+</html>
