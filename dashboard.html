@@ -1025,7 +1025,11 @@ body {
 
   <!-- ENGLISH -->
   <div class="module" id="module-english">
-    <div id="englishContent"></div>
+    <div class="main-header">
+      <h2>📚 英语学习 · PETS三级</h2>
+      <p>全国英语等级考试三级（≈ 雅思 4.5–5）核心词汇与语法速记</p>
+    </div>
+    <div class="main-content" id="englishContent"></div>
   </div>
 
 </main>
@@ -2055,12 +2059,6 @@ function renderEnglish() {
   const pct = coreTotal ? Math.round(coreDone / coreTotal * 100) : 0;
 
   el.innerHTML = `
-    <div class="main-header">
-      <h2>📚 英语学习 · PETS三级</h2>
-      <p>全国英语等级考试三级（≈ 雅思 4.5–5）核心词汇与语法速记</p>
-    </div>
-    <div class="main-content">
-
       <div class="eng-progress">
         <div class="eng-progress-top">
           <span>📈 核心词掌握进度</span>
@@ -2070,13 +2068,6 @@ function renderEnglish() {
       </div>
 
       <div class="section-title">📖 我的生词本（${words.length}）</div>
-      <div class="input-row" style="flex-wrap:wrap">
-        <input type="text" id="ewWord" placeholder="单词，如 achieve" style="min-width:130px">
-        <input type="text" id="ewPhon" placeholder="音标（选填）" style="width:120px">
-        <input type="text" id="ewMean" placeholder="释义，如 v. 实现" style="min-width:160px">
-        <input type="text" id="ewEx" placeholder="例句（选填）" style="min-width:200px">
-        <button class="btn btn-primary" onclick="addWord()">添加生词</button>
-      </div>
       <div id="wordList"></div>
 
       <div class="section-title">🧠 PETS三级高频核心词（点「标记掌握」收藏）</div>
@@ -2106,8 +2097,7 @@ function renderEnglish() {
             <div class="g-desc">${escHtml(g.desc)}</div>
           </div>`).join('')}
       </div>
-
-    </div>`;
+  `;
 
   const list = document.getElementById('wordList');
   if (words.length === 0) {
@@ -2128,21 +2118,6 @@ function renderEnglish() {
         </div>
       </div>`).join('');
   }
-}
-
-function addWord() {
-  const wEl = document.getElementById('ewWord');
-  const mEl = document.getElementById('ewMean');
-  const pEl = document.getElementById('ewPhon');
-  const eEl = document.getElementById('ewEx');
-  const word = wEl.value.trim();
-  const meaning = mEl.value.trim();
-  if (!word && !meaning) return;
-  if (!data.english) data.english = { words: [], masteredCore: [] };
-  if (!data.english.words) data.english.words = [];
-  data.english.words.unshift({ id: uid(), word, phonetic: pEl.value.trim(), meaning, example: eEl.value.trim(), mastered: false, createdAt: now() });
-  saveData(data);
-  renderAll();
 }
 
 function toggleWordMastered(id) {
