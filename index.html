@@ -36,10 +36,52 @@
   --transition: 0.2s ease;
 }
 
+/* ===== 浅色主题：仅 [data-theme="light"] 或 [data-theme="auto" 且系统浅色] 生效 ===== */
+:root[data-theme="light"] {
+  --bg: #f4f5fa;
+  --bg-sidebar: #ffffff;
+  --bg-card: #ffffff;
+  --bg-hover: #eef0f7;
+  --bg-input: #eef1f8;
+  --border: #e3e6ef;
+  --text: #1a1d2e;
+  --text-secondary: #5c6078;
+  --text-muted: #9aa0b5;
+  --accent: #4c63ff;
+  --accent-glow: rgba(76,99,255,0.12);
+  --green: #16a34a;
+  --orange: #d97706;
+  --red: #dc2626;
+  --purple: #7c3aed;
+  --cyan: #0284c7;
+  --pink: #db2777;
+}
+@media (prefers-color-scheme: light) {
+  :root[data-theme="auto"] {
+    --bg: #f4f5fa;
+    --bg-sidebar: #ffffff;
+    --bg-card: #ffffff;
+    --bg-hover: #eef0f7;
+    --bg-input: #eef1f8;
+    --border: #e3e6ef;
+    --text: #1a1d2e;
+    --text-secondary: #5c6078;
+    --text-muted: #9aa0b5;
+    --accent: #4c63ff;
+    --accent-glow: rgba(76,99,255,0.12);
+    --green: #16a34a;
+    --orange: #d97706;
+    --red: #dc2626;
+    --purple: #7c3aed;
+    --cyan: #0284c7;
+    --pink: #db2777;
+  }
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
-  background: #0f1117;
+  background: var(--bg);
 }
 
 body {
@@ -824,6 +866,7 @@ body {
     <div class="logo">⚡ 羊总工作台</div>
     <div class="date" id="sidebarDate"></div>
     <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+      <button class="btn btn-sm" id="themeBtn" onclick="cycleTheme()" title="切换主题：跟随系统 / 浅色 / 深色">🌗 跟随系统</button>
       <button class="btn btn-sm" onclick="exportData()" title="导出数据为JSON">⬇️ 导出</button>
       <button class="btn btn-sm" onclick="document.getElementById('importFile').click()" title="从JSON导入数据">⬆️ 导入</button>
       <button class="btn btn-sm" onclick="pullFromCloud()" title="立即与云端同步">🔄 同步</button>
@@ -1872,7 +1915,42 @@ function escHtml(str) {
   return div.innerHTML;
 }
 
+// ==================== 主题（跟随设备 / 浅色 / 深色） ====================
+const THEME_KEY = 'saki_dashboard_theme';
+const THEME_ORDER = ['auto', 'light', 'dark'];
+const THEME_META = {
+  auto:  { icon: '🌗', label: '跟随系统' },
+  light: { icon: '🌞', label: '浅色' },
+  dark:  { icon: '🌙', label: '深色' }
+};
+function getTheme() {
+  return localStorage.getItem(THEME_KEY) || 'auto';
+}
+function applyTheme(t) {
+  const root = document.documentElement;
+  root.setAttribute('data-theme', t);
+  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+  const effectiveDark = t === 'dark' ? true : (t === 'light' ? false : !prefersLight);
+  const mc = document.querySelector('meta[name="theme-color"]');
+  const sb = document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]');
+  if (mc) mc.setAttribute('content', effectiveDark ? '#0f1117' : '#f4f5fa');
+  if (sb) sb.setAttribute('content', effectiveDark ? 'black-translucent' : 'default');
+  const btn = document.getElementById('themeBtn');
+  if (btn) { const m = THEME_META[t]; btn.textContent = m.icon + ' ' + m.label; }
+  localStorage.setItem(THEME_KEY, t);
+}
+function cycleTheme() {
+  const cur = getTheme();
+  const next = THEME_ORDER[(THEME_ORDER.indexOf(cur) + 1) % THEME_ORDER.length];
+  applyTheme(next);
+}
+// 系统主题变化时，若处于“跟随系统”模式则实时跟随
+window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+  if (getTheme() === 'auto') applyTheme('auto');
+});
+
 // ==================== INIT ====================
+applyTheme(getTheme());
 renderAll();
 pullFromCloud(); // 启动即从云端拉取，多设备保持一致
 
