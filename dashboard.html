@@ -767,10 +767,13 @@ body {
 
 /* AI report */
 .ai-report {
-  background: linear-gradient(135deg, #1a1d2e, #20243a);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 16px 18px;
+}
+:root:not([data-theme="light"]) .ai-report {
+  background: linear-gradient(135deg, #1a1d2e, #20243a);
 }
 .ai-report-head {
   display: flex;
