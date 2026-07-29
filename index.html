@@ -745,6 +745,23 @@ body {
   text-decoration: underline;
 }
 
+/* ========== FITNESS ========== */
+.fit-metrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.fit-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.fit-card .lbl{font-size:12px;color:var(--text-secondary);display:flex;align-items:center;gap:6px}
+.fit-card .val{font-size:25px;font-weight:700;margin-top:6px;line-height:1.15}
+.fit-card .sub{font-size:11px;color:var(--text-muted);margin-top:3px}
+.fit-banner{background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6}
+.fit-banner b{color:var(--text)}
+.meal-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.meal-item:last-child{border-bottom:none}
+.meal-thumb{width:46px;height:46px;border-radius:8px;object-fit:cover;border:1px solid var(--border);flex:none}
+.meal-info{flex:1;min-width:0}
+.meal-name{font-weight:600;font-size:14px}
+.meal-kcal{font-size:12px;color:var(--text-muted)}
+.fit-photo-preview{margin-top:8px}
+.fit-photo-preview img{max-width:120px;border-radius:8px;border:1px solid var(--border)}
+
 /* ========== HOME PAGE ========== */
 .home-section {
   margin-bottom: 18px;
@@ -964,6 +981,9 @@ body {
   <button class="nav-item" data-module="english">
     <span class="icon">📚</span> 英语学习
   </button>
+  <button class="nav-item" data-module="fitness">
+    <span class="icon">💪</span> 减脂塑型
+  </button>
 </aside>
 
 <!-- 手机端：汉堡菜单 + 遮罩 -->
@@ -1030,6 +1050,15 @@ body {
       <p>全国英语等级考试三级（≈ 雅思 4.5–5）核心词汇与语法速记</p>
     </div>
     <div class="main-content" id="englishContent"></div>
+  </div>
+
+  <!-- FITNESS -->
+  <div class="module" id="module-fitness">
+    <div class="main-header">
+      <h2>💪 减脂塑型管理</h2>
+      <p>体重追踪 · 热量记录 · 自动算缺口</p>
+    </div>
+    <div class="main-content" id="fitnessContent"></div>
   </div>
 
 </main>
@@ -1171,6 +1200,13 @@ function getDefaultData() {
     english: {       // 英语学习（PETS三级）
       words: [],              // 生词本 { id, word, phonetic, meaning, example, mastered, createdAt }
       masteredCore: []        // 已掌握的核心词 id 列表
+    },
+    fitness: {       // 减脂塑型管理
+      startWeight: null,      // 初始体重 kg
+      currentWeight: null,    // 当前体重 kg
+      targetWeight: null,     // 目标体重 kg（选填）
+      tdee: 1800,             // 每日总消耗 kcal（用于算缺口）
+      meals: []               // 每日饮食 { id, date, name, kcal, photoId }
     }
   };
 }
@@ -1364,6 +1400,8 @@ function renderAll() {
   if (!data.english) data.english = { words: [], masteredCore: [] };
   if (!data.english.words) data.english.words = [];
   if (!data.english.masteredCore) data.english.masteredCore = [];
+  if (!data.fitness) data.fitness = { startWeight:null, currentWeight:null, targetWeight:null, tdee:1800, meals:[] };
+  if (!data.fitness.meals) data.fitness.meals = [];
   updateBadges();
   updateDate();
   if (currentModule === 'home') renderHome();
@@ -1373,6 +1411,7 @@ function renderAll() {
   else if (currentModule === 'videos') renderVideos();
   else if (currentModule === 'memos') renderMemos();
   else if (currentModule === 'english') renderEnglish();
+  else if (currentModule === 'fitness') renderFitness();
 }
 
 function updateDate() {
@@ -2262,6 +2301,158 @@ document.addEventListener('click', function(e) {
     else if (open && dx < -80) toggleSidebar();
   }, { passive: true });
 })();
+// ==================== 减脂塑型管理 ====================
+let pendingFitPhoto = '';
+function getFitness() {
+  if (!data.fitness) data.fitness = { startWeight:null, currentWeight:null, targetWeight:null, tdee:1800, meals:[] };
+  if (!data.fitness.meals) data.fitness.meals = [];
+  return data.fitness;
+}
+function fitPhotoStore() {
+  try { return JSON.parse(localStorage.getItem('saki_fit_photos') || '{}'); }
+  catch(e) { return {}; }
+}
+function fitSavePhoto(id, dataUrl) {
+  const s = fitPhotoStore();
+  s[id] = dataUrl;
+  try { localStorage.setItem('saki_fit_photos', JSON.stringify(s)); } catch(e) {}
+}
+function fitGetPhoto(id) {
+  return fitPhotoStore()[id] || '';
+}
+function renderFitness() {
+  const f = getFitness();
+  pendingFitPhoto = '';
+  const today = todayStr();
+  const current = f.currentWeight;
+  const start = f.startWeight;
+  const lost = (start != null && current != null) ? (start - current) : null;
+  const todayMeals = f.meals.filter(m => m.date === today);
+  const todayKcal = todayMeals.reduce((s, m) => s + (Number(m.kcal) || 0), 0);
+  const tdee = Number(f.tdee) || 0;
+  const deficit = tdee ? (tdee - todayKcal) : null;
+  const el = document.getElementById('fitnessContent');
+  el.innerHTML = `
+    <div class='fit-metrics'>
+      <div class='fit-card'>
+        <div class='lbl'>⚖️ 当前体重</div>
+        <div class='val'>${current != null ? current : '—'}<span style='font-size:14px;font-weight:500;color:var(--text-muted)'> kg</span></div>
+        <div class='sub'>${f.targetWeight != null ? '目标 ' + f.targetWeight + ' kg' : '未设目标'}</div>
+      </div>
+      <div class='fit-card'>
+        <div class='lbl'>📉 已减重</div>
+        <div class='val'>${lost != null ? (lost >= 0 ? lost.toFixed(1) : '0.0') : '—'}<span style='font-size:14px;font-weight:500;color:var(--text-muted)'> kg</span></div>
+        <div class='sub'>${start != null ? '初始 ' + start + ' kg' : '未设初始体重'}</div>
+      </div>
+      <div class='fit-card'>
+        <div class='lbl'>🔥 今日热量</div>
+        <div class='val'>${todayKcal}<span style='font-size:14px;font-weight:500;color:var(--text-muted)'> kcal</span></div>
+        <div class='sub'>今日 ${todayMeals.length} 餐</div>
+      </div>
+      <div class='fit-card'>
+        <div class='lbl'>🎯 热量缺口</div>
+        <div class='val'>${deficit != null ? (deficit >= 0 ? '+' + deficit : deficit) : '—'}<span style='font-size:14px;font-weight:500;color:var(--text-muted)'> kcal</span></div>
+        <div class='sub'>${tdee ? '每日消耗 ' + tdee + ' kcal' : '未设每日消耗'}</div>
+      </div>
+    </div>
+
+    <div class='fit-banner'>
+      💡 <b>怎么记热量：</b>拍下食物照片 → 把照片发到咱们 WorkBuddy 对话里，我帮你识别热量 → 把数值填到下方「热量」框即可。照片只存在你本机，不会上传到云端。
+    </div>
+
+    <div class='section-title'>🧍 身体数据</div>
+    <div class='input-row' style='flex-wrap:wrap'>
+      <input type='number' step='0.1' id='fitCurrent' placeholder='当前体重kg' value='${current != null ? current : ''}' style='width:120px'>
+      <input type='number' step='0.1' id='fitStart' placeholder='初始体重kg' value='${start != null ? start : ''}' style='width:120px'>
+      <input type='number' step='0.1' id='fitTarget' placeholder='目标kg(选填)' value='${f.targetWeight != null ? f.targetWeight : ''}' style='width:120px'>
+      <input type='number' id='fitTdee' placeholder='每日消耗kcal' value='${tdee ? tdee : ''}' style='width:130px'>
+      <button class='btn btn-primary' onclick="saveFitnessMeta()">保存</button>
+    </div>
+
+    <div class='section-title'>🍽️ 今日热量（拍照 + 录入）</div>
+    <div class='input-row' style='flex-wrap:wrap;align-items:flex-start'>
+      <input type='file' id='fitPhoto' accept='image/*' capture='environment' style='display:none' onchange="handleFitPhoto(this.files[0])">
+      <button class='btn btn-accent' onclick="document.getElementById('fitPhoto').click()">📷 拍照 / 上传</button>
+      <input type='text' id='fitMealName' placeholder='餐名，如 午餐' style='min-width:120px'>
+      <input type='number' id='fitMealKcal' placeholder='热量 kcal' style='width:120px'>
+      <button class='btn btn-primary' onclick="addMeal()">添加</button>
+    </div>
+    <div id='fitPhotoPreview' class='fit-photo-preview'></div>
+    <div id='fitMealList'></div>
+  `;
+
+  const list = document.getElementById('fitMealList');
+  if (todayMeals.length === 0) {
+    list.innerHTML = '<div class="empty-state" style="padding:20px"><p>今天还没记录饮食，拍一张开始吧</p></div>';
+  } else {
+    list.innerHTML = todayMeals.map(m => `
+      <div class='meal-item'>
+        ${m.photoId ? `<img class='meal-thumb' src='${fitGetPhoto(m.photoId)}' alt=''>` : ''}
+        <div class='meal-info'>
+          <div class='meal-name'>${escHtml(m.name || '未命名')}</div>
+          <div class='meal-kcal'>${m.kcal} kcal${m.photoId ? ' · 📷已附照片' : ''}</div>
+        </div>
+        <button class='btn btn-sm btn-danger' onclick="deleteMeal('${m.id}')">删除</button>
+      </div>`).join('');
+  }
+}
+function saveFitnessMeta() {
+  const f = getFitness();
+  const c = document.getElementById('fitCurrent').value.trim();
+  const s = document.getElementById('fitStart').value.trim();
+  const t = document.getElementById('fitTarget').value.trim();
+  const d = document.getElementById('fitTdee').value.trim();
+  f.currentWeight = c === '' ? null : Number(c);
+  f.startWeight = s === '' ? null : Number(s);
+  f.targetWeight = t === '' ? null : Number(t);
+  f.tdee = d === '' ? 1800 : Number(d);
+  if (f.startWeight == null && f.currentWeight != null) f.startWeight = f.currentWeight;
+  saveData(data);
+  renderFitness();
+}
+function handleFitPhoto(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      const maxW = 800;
+      const scale = Math.min(1, maxW / img.width);
+      const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      let dataUrl;
+      try { dataUrl = canvas.toDataURL('image/jpeg', 0.7); }
+      catch(err) { dataUrl = e.target.result; }
+      pendingFitPhoto = dataUrl;
+      const pv = document.getElementById('fitPhotoPreview');
+      if (pv) pv.innerHTML = '<img src="' + dataUrl + '" alt="预览"><div style="font-size:12px;color:var(--text-muted);margin-top:4px">照片已就绪，填好餐名和热量点「添加」即可（照片仅存本机）</div>';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function addMeal() {
+  const f = getFitness();
+  const name = document.getElementById('fitMealName').value.trim();
+  const kcal = document.getElementById('fitMealKcal').value.trim();
+  if (!name && !kcal) return;
+  const id = uid();
+  const meal = { id: id, date: todayStr(), name: name, kcal: kcal === '' ? 0 : Number(kcal), photoId: pendingFitPhoto ? id : null };
+  if (pendingFitPhoto) { fitSavePhoto(id, pendingFitPhoto); pendingFitPhoto = ''; }
+  f.meals.unshift(meal);
+  saveData(data);
+  renderFitness();
+}
+function deleteMeal(id) {
+  const f = getFitness();
+  f.meals = f.meals.filter(m => m.id !== id);
+  const s = fitPhotoStore();
+  if (s[id]) { delete s[id]; try { localStorage.setItem('saki_fit_photos', JSON.stringify(s)); } catch(e) {} }
+  saveData(data);
+  renderFitness();
+}
 </script>
 </body>
 </html>
