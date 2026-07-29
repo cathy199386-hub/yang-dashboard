@@ -753,6 +753,9 @@ body {
 .fit-card .sub{font-size:11px;color:var(--text-muted);margin-top:3px}
 .fit-banner{background:var(--bg-hover);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.6}
 .fit-banner b{color:var(--text)}
+.fit-calc{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.9}
+.fit-calc b{color:var(--accent,#7c5cff);font-size:14px}
+.fit-calc .formula{font-size:11.5px;color:var(--text-muted);margin-top:6px}
 .meal-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
 .meal-item:last-child{border-bottom:none}
 .meal-thumb{width:46px;height:46px;border-radius:8px;object-fit:cover;border:1px solid var(--border);flex:none}
@@ -1205,7 +1208,10 @@ function getDefaultData() {
       startWeight: null,      // 初始体重 kg
       currentWeight: null,    // 当前体重 kg
       targetWeight: null,     // 目标体重 kg（选填）
-      tdee: 1800,             // 每日总消耗 kcal（用于算缺口）
+      height: null,           // 身高 cm
+      age: null,              // 年龄
+      gender: 'f',            // 'f' 女 / 'm' 男
+      activity: 1.375,        // 活动系数（久坐1.2/轻度1.375/中度1.55/高度1.725/极高1.9）
       meals: []               // 每日饮食 { id, date, name, kcal, photoId }
     }
   };
@@ -1400,7 +1406,7 @@ function renderAll() {
   if (!data.english) data.english = { words: [], masteredCore: [] };
   if (!data.english.words) data.english.words = [];
   if (!data.english.masteredCore) data.english.masteredCore = [];
-  if (!data.fitness) data.fitness = { startWeight:null, currentWeight:null, targetWeight:null, tdee:1800, meals:[] };
+  if (!data.fitness) data.fitness = { startWeight:null, currentWeight:null, targetWeight:null, height:null, age:null, gender:'f', activity:1.375, meals:[] };
   if (!data.fitness.meals) data.fitness.meals = [];
   updateBadges();
   updateDate();
@@ -2304,7 +2310,7 @@ document.addEventListener('click', function(e) {
 // ==================== 减脂塑型管理 ====================
 let pendingFitPhoto = '';
 function getFitness() {
-  if (!data.fitness) data.fitness = { startWeight:null, currentWeight:null, targetWeight:null, tdee:1800, meals:[] };
+  if (!data.fitness) data.fitness = { startWeight:null, currentWeight:null, targetWeight:null, height:null, age:null, gender:'f', activity:1.375, meals:[] };
   if (!data.fitness.meals) data.fitness.meals = [];
   return data.fitness;
 }
@@ -2320,6 +2326,17 @@ function fitSavePhoto(id, dataUrl) {
 function fitGetPhoto(id) {
   return fitPhotoStore()[id] || '';
 }
+function calcBMR(f) {
+  const w = Number(f.currentWeight), h = Number(f.height), a = Number(f.age);
+  if (!w || !h || !a) return null;
+  const base = 10 * w + 6.25 * h - 5 * a;
+  return f.gender === 'm' ? base + 5 : base - 161;
+}
+function calcTDEE(f) {
+  const bmr = calcBMR(f);
+  if (bmr == null) return null;
+  return bmr * (Number(f.activity) || 1.2);
+}
 function renderFitness() {
   const f = getFitness();
   pendingFitPhoto = '';
@@ -2329,8 +2346,10 @@ function renderFitness() {
   const lost = (start != null && current != null) ? (start - current) : null;
   const todayMeals = f.meals.filter(m => m.date === today);
   const todayKcal = todayMeals.reduce((s, m) => s + (Number(m.kcal) || 0), 0);
-  const tdee = Number(f.tdee) || 0;
-  const deficit = tdee ? (tdee - todayKcal) : null;
+  const bmr = calcBMR(f);
+  const tdee = calcTDEE(f);
+  const deficit = tdee != null ? (tdee - todayKcal) : null;
+  const recommend = tdee != null ? (tdee - 500) : null;
   const el = document.getElementById('fitnessContent');
   el.innerHTML = `
     <div class='fit-metrics'>
@@ -2351,22 +2370,42 @@ function renderFitness() {
       </div>
       <div class='fit-card'>
         <div class='lbl'>🎯 热量缺口</div>
-        <div class='val'>${deficit != null ? (deficit >= 0 ? '+' + deficit : deficit) : '—'}<span style='font-size:14px;font-weight:500;color:var(--text-muted)'> kcal</span></div>
-        <div class='sub'>${tdee ? '每日消耗 ' + tdee + ' kcal' : '未设每日消耗'}</div>
+        <div class='val'>${deficit != null ? (deficit >= 0 ? '+' + Math.round(deficit) : Math.round(deficit)) : '—'}<span style='font-size:14px;font-weight:500;color:var(--text-muted)'> kcal</span></div>
+        <div class='sub'>${tdee != null ? '每日消耗 ' + Math.round(tdee) + ' kcal' : '完善身体数据可算'}</div>
       </div>
     </div>
 
     <div class='fit-banner'>
-      💡 <b>怎么记热量：</b>拍下食物照片 → 把照片发到咱们 WorkBuddy 对话里，我帮你识别热量 → 把数值填到下方「热量」框即可。照片只存在你本机，不会上传到云端。
+      💡 <b>热量缺口科学计算（Mifflin-St Jeor）：</b> BMR = 10×体重 + 6.25×身高 − 5×年龄 ${f.gender==='m'?'+5':'-161'}，TDEE = BMR × 活动系数，缺口 = TDEE − 今日摄入。
     </div>
 
-    <div class='section-title'>🧍 身体数据</div>
+    <div class='section-title'>🧍 身体数据（用于科学计算）</div>
     <div class='input-row' style='flex-wrap:wrap'>
       <input type='number' step='0.1' id='fitCurrent' placeholder='当前体重kg' value='${current != null ? current : ''}' style='width:120px'>
       <input type='number' step='0.1' id='fitStart' placeholder='初始体重kg' value='${start != null ? start : ''}' style='width:120px'>
       <input type='number' step='0.1' id='fitTarget' placeholder='目标kg(选填)' value='${f.targetWeight != null ? f.targetWeight : ''}' style='width:120px'>
-      <input type='number' id='fitTdee' placeholder='每日消耗kcal' value='${tdee ? tdee : ''}' style='width:130px'>
+      <input type='number' step='0.1' id='fitHeight' placeholder='身高cm' value='${f.height != null ? f.height : ''}' style='width:110px'>
+      <input type='number' id='fitAge' placeholder='年龄' value='${f.age != null ? f.age : ''}' style='width:90px'>
+      <select id='fitGender' style='width:90px'>
+        <option value='f'${f.gender!=='m'?' selected':''}>女</option>
+        <option value='m'${f.gender==='m'?' selected':''}>男</option>
+      </select>
+      <select id='fitActivity'>
+        <option value='1.2'${f.activity==1.2?' selected':''}>久坐 1.2</option>
+        <option value='1.375'${f.activity==1.375?' selected':''}>轻度 1.375</option>
+        <option value='1.55'${f.activity==1.55?' selected':''}>中度 1.55</option>
+        <option value='1.725'${f.activity==1.725?' selected':''}>高度 1.725</option>
+        <option value='1.9'${f.activity==1.9?' selected':''}>极高 1.9</option>
+      </select>
       <button class='btn btn-primary' onclick="saveFitnessMeta()">保存</button>
+    </div>
+
+    <div class='fit-calc'>
+      ${bmr != null ? `
+        <div>BMR 基础代谢 ≈ <b>${Math.round(bmr)}</b> kcal/天</div>
+        <div>TDEE 每日总消耗 ≈ <b>${Math.round(tdee)}</b> kcal/天（BMR × ${f.activity}）</div>
+        <div>建议减脂摄入 ≈ <b>${Math.round(recommend)}</b> kcal/天（TDEE − 500）</div>
+      ` : '填写 当前体重 / 身高 / 年龄 后自动计算 BMR 与 TDEE。'}
     </div>
 
     <div class='section-title'>🍽️ 今日热量（拍照 + 录入）</div>
@@ -2401,11 +2440,17 @@ function saveFitnessMeta() {
   const c = document.getElementById('fitCurrent').value.trim();
   const s = document.getElementById('fitStart').value.trim();
   const t = document.getElementById('fitTarget').value.trim();
-  const d = document.getElementById('fitTdee').value.trim();
+  const h = document.getElementById('fitHeight').value.trim();
+  const a = document.getElementById('fitAge').value.trim();
+  const g = document.getElementById('fitGender').value;
+  const act = Number(document.getElementById('fitActivity').value);
   f.currentWeight = c === '' ? null : Number(c);
   f.startWeight = s === '' ? null : Number(s);
   f.targetWeight = t === '' ? null : Number(t);
-  f.tdee = d === '' ? 1800 : Number(d);
+  f.height = h === '' ? null : Number(h);
+  f.age = a === '' ? null : Number(a);
+  f.gender = g;
+  f.activity = act;
   if (f.startWeight == null && f.currentWeight != null) f.startWeight = f.currentWeight;
   saveData(data);
   renderFitness();
