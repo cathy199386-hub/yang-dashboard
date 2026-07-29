@@ -34,6 +34,9 @@
   --radius: 10px;
   --radius-sm: 6px;
   --transition: 0.2s ease;
+  --glass-bg: rgba(255,255,255,0.07);
+  --glass-border: rgba(255,255,255,0.16);
+  --glass-shadow: rgba(0,0,0,0.25);
 }
 
 /* ===== 浅色主题：仅 [data-theme="light"] 或 [data-theme="auto" 且系统浅色] 生效 ===== */
@@ -55,6 +58,9 @@
   --purple: #7c3aed;
   --cyan: #0284c7;
   --pink: #db2777;
+  --glass-bg: rgba(255,255,255,0.42);
+  --glass-border: rgba(255,255,255,0.65);
+  --glass-shadow: rgba(31,41,86,0.12);
 }
 @media (prefers-color-scheme: light) {
   :root[data-theme="auto"] {
@@ -75,6 +81,9 @@
     --purple: #7c3aed;
     --cyan: #0284c7;
     --pink: #db2777;
+    --glass-bg: rgba(255,255,255,0.42);
+    --glass-border: rgba(255,255,255,0.65);
+    --glass-shadow: rgba(31,41,86,0.12);
   }
 }
 
@@ -764,6 +773,36 @@ body {
 .meal-kcal{font-size:12px;color:var(--text-muted)}
 .fit-photo-preview{margin-top:8px}
 .fit-photo-preview img{max-width:120px;border-radius:8px;border:1px solid var(--border)}
+
+/* 文字描述自动估算热量 */
+.fit-text-preview{font-size:12.5px;color:var(--text-secondary);margin:8px 0 2px;line-height:1.9;min-height:1px}
+.ttp-item{display:inline-block;margin:0 8px 6px 0;padding:2px 10px;background:var(--bg-hover);border:1px solid var(--border);border-radius:20px;font-size:12px;color:var(--text-secondary)}
+.ttp-item b{color:var(--text)}
+.ttp-total{margin-top:6px;color:var(--text);font-size:13px}
+.ttp-total b{color:var(--text);font-size:15px}
+.ttp-empty{color:var(--text-muted);font-size:12px}
+
+/* 磨砂玻璃卡片 */
+.glass-card{
+  background:var(--glass-bg);
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius);
+  box-shadow:0 6px 28px var(--glass-shadow);
+  position:relative;
+  overflow:hidden;
+}
+.glass-card::before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.10),rgba(255,255,255,0));
+  pointer-events:none;
+}
+.fit-glass{display:flex;gap:8px;padding:14px 16px;flex-wrap:wrap}
+.fit-glass .gc-item{flex:1;min-width:62px;text-align:center;position:relative;z-index:1}
+.fit-glass .gc-lbl{font-size:11px;color:var(--text-secondary);margin-bottom:5px}
+.fit-glass .gc-val{font-size:19px;font-weight:700;color:var(--text);line-height:1.1}
+.fit-glass .gc-val span{font-size:11px;font-weight:500;color:var(--text-muted);margin-left:2px}
 
 /* ========== HOME PAGE ========== */
 .home-section {
@@ -1499,6 +1538,30 @@ function renderHome() {
     </div>
   `;
 
+  // ---- 减脂塑形概览（磨砂玻璃小框） ----
+  const ff = getFitness();
+  const fToday = todayStr();
+  const fCurrent = ff.currentWeight;
+  const fStart = ff.startWeight;
+  const fLost = (fStart != null && fCurrent != null) ? (fStart - fCurrent) : null;
+  const fMeals = ff.meals.filter(m => m.date === fToday);
+  const fKcal = fMeals.reduce((s, m) => s + (Number(m.kcal) || 0), 0);
+  const fTdee = calcTDEE(ff);
+  const fDeficit = fTdee != null ? (fTdee - fKcal) : null;
+  const fitHtml = `
+    <div class="home-section">
+      <div class="home-section-title">💪 减脂塑形
+        <span class="hs-badge" style="cursor:pointer" onclick="switchModule('fitness')">查看详情 →</span>
+      </div>
+      <div class="glass-card fit-glass">
+        <div class="gc-item"><div class="gc-lbl">当前体重</div><div class="gc-val">${fCurrent != null ? fCurrent : '—'}<span>kg</span></div></div>
+        <div class="gc-item"><div class="gc-lbl">已减重</div><div class="gc-val">${fLost != null ? (fLost >= 0 ? fLost.toFixed(1) : '0.0') : '—'}<span>kg</span></div></div>
+        <div class="gc-item"><div class="gc-lbl">今日热量</div><div class="gc-val">${fKcal}<span>kcal</span></div></div>
+        <div class="gc-item"><div class="gc-lbl">热量缺口</div><div class="gc-val">${fDeficit != null ? (fDeficit >= 0 ? '+' + Math.round(fDeficit) : Math.round(fDeficit)) : '—'}<span>kcal</span></div></div>
+      </div>
+    </div>
+  `;
+
   el.innerHTML = `
     <div class="home-section">
       <div class="ai-report">
@@ -1509,6 +1572,7 @@ function renderHome() {
         <div class="report-text">${report}</div>
       </div>
     </div>
+    ${fitHtml}
     ${planHtml}
     ${todoHtml}
   `;
@@ -2309,6 +2373,91 @@ document.addEventListener('click', function(e) {
 })();
 // ==================== 减脂塑型管理 ====================
 let pendingFitPhoto = '';
+// 常见食物热量库（每「份/个/碗/100g」估算值，单位 kcal，仅供估算参考）
+const FOOD_CALORIE_DB = [
+  { kw:'米饭', cal:230, aliases:['白饭','大米饭','一碗饭'] },
+  { kw:'粥', cal:70, aliases:['白粥','米粥'] },
+  { kw:'馒头', cal:220, aliases:[] },
+  { kw:'面包', cal:130, aliases:['吐司','切片面包'] },
+  { kw:'面条', cal:280, aliases:['面','汤面','拌面'] },
+  { kw:'包子', cal:220, aliases:[] },
+  { kw:'饺子', cal:50, aliases:['水饺'] },
+  { kw:'鸡蛋', cal:70, aliases:['蛋','水煮蛋','煎蛋'] },
+  { kw:'鸡胸肉', cal:130, aliases:['鸡胸'] },
+  { kw:'鸡腿', cal:150, aliases:['鸡腿肉'] },
+  { kw:'鸡肉', cal:160, aliases:['鸡块'] },
+  { kw:'牛肉', cal:250, aliases:['牛排'] },
+  { kw:'猪肉', cal:300, aliases:['五花肉','瘦肉'] },
+  { kw:'鱼肉', cal:120, aliases:['鱼','清蒸鱼'] },
+  { kw:'虾', cal:90, aliases:['虾仁'] },
+  { kw:'牛奶', cal:150, aliases:['纯牛奶','鲜奶'] },
+  { kw:'酸奶', cal:100, aliases:['优格'] },
+  { kw:'豆浆', cal:80, aliases:[] },
+  { kw:'苹果', cal:95, aliases:[] },
+  { kw:'香蕉', cal:105, aliases:[] },
+  { kw:'橙子', cal:70, aliases:['桔子','橘子'] },
+  { kw:'西瓜', cal:60, aliases:[] },
+  { kw:'黄瓜', cal:15, aliases:[] },
+  { kw:'番茄', cal:18, aliases:['西红柿'] },
+  { kw:'青菜', cal:25, aliases:['蔬菜','西兰花','白菜','菠菜'] },
+  { kw:'土豆', cal:150, aliases:['马铃薯'] },
+  { kw:'红薯', cal:130, aliases:['地瓜','番薯'] },
+  { kw:'玉米', cal:200, aliases:[] },
+  { kw:'豆腐', cal:80, aliases:[] },
+  { kw:'沙拉', cal:50, aliases:['蔬菜沙拉'] },
+  { kw:'可乐', cal:140, aliases:['汽水'] },
+  { kw:'咖啡', cal:5, aliases:['美式','黑咖啡'] },
+  { kw:'啤酒', cal:150, aliases:[] },
+  { kw:'蛋糕', cal:350, aliases:[] },
+  { kw:'巧克力', cal:550, aliases:[] },
+  { kw:'饼干', cal:450, aliases:[] },
+  { kw:'薯片', cal:550, aliases:[] },
+  { kw:'坚果', cal:600, aliases:['花生','核桃','腰果'] },
+  { kw:'食用油', cal:120, aliases:['油','炒菜油'] },
+  { kw:'牛肉面', cal:450, aliases:[] },
+  { kw:'披萨', cal:250, aliases:[] },
+  { kw:'汉堡', cal:500, aliases:[] },
+  { kw:'炸鸡', cal:300, aliases:[] },
+  { kw:'寿司', cal:40, aliases:[] },
+  { kw:'麻辣烫', cal:400, aliases:[] },
+  { kw:'麻辣香锅', cal:500, aliases:[] }
+];
+
+// 文字描述 → 估算热量：按食物关键词 + 前置数量（碗/个/份/根/片/杯/块/条）匹配
+function estimateCalories(text) {
+  if (!text) return { total: 0, items: [] };
+  const CN_NUM = { '两':2, '二':2, '三':3, '四':4, '五':5, '六':6, '七':7, '八':8, '九':9, '半':0.5 };
+  const UNIT = '碗个份根片杯块条只袋罐串勺把枚';
+  const ordered = FOOD_CALORIE_DB.slice().sort((a, b) => b.kw.length - a.kw.length);
+  const consumed = [];
+  const items = [];
+  let total = 0;
+  for (const food of ordered) {
+    const keys = [food.kw, ...(food.aliases || [])].sort((a, b) => b.length - a.length);
+    for (const k of keys) {
+      let from = 0, idx;
+      while ((idx = text.indexOf(k, from)) >= 0) {
+        const end = idx + k.length;
+        const overlap = consumed.some(c => idx < c[1] && end > c[0]);
+        if (!overlap) {
+          const before = text.slice(Math.max(0, idx - 9), idx);
+          const m = before.match(new RegExp('(?:(\\d+(?:\\.\\d+)?)|([两二三四五六七八九半]))\\s*[' + UNIT + ']*\\s*$'));
+          let qty = 1;
+          if (m) qty = m[1] ? parseFloat(m[1]) : (CN_NUM[m[2]] || 1);
+          const cal = Math.round(food.cal * qty);
+          items.push({ name: (qty > 1 ? qty + '×' : '') + k, cal: cal });
+          total += cal;
+          consumed.push([idx, end]);
+          from = end;
+          break;
+        }
+        from = idx + 1;
+      }
+    }
+  }
+  return { total, items };
+}
+
 function getFitness() {
   if (!data.fitness) data.fitness = { startWeight:null, currentWeight:null, targetWeight:null, height:null, age:null, gender:'f', activity:1.375, meals:[] };
   if (!data.fitness.meals) data.fitness.meals = [];
@@ -2416,6 +2565,14 @@ function renderFitness() {
       <input type='number' id='fitMealKcal' placeholder='热量 kcal' style='width:120px'>
       <button class='btn btn-primary' onclick="addMeal()">添加</button>
     </div>
+
+    <div class='section-title' style='margin-top:18px'>✍️ 文字描述自动估算热量</div>
+    <div class='input-row' style='flex-wrap:wrap;align-items:flex-start'>
+      <input type='text' id='fitMealText' placeholder='描述你吃了什么，如：2碗米饭 一个鸡腿 一杯牛奶 一个苹果' style='min-width:240px;flex:1' oninput='previewTextCalories()'>
+      <button class='btn btn-primary' onclick="addMealFromText()">识别并添加</button>
+    </div>
+    <div id='fitTextPreview' class='fit-text-preview'></div>
+
     <div id='fitPhotoPreview' class='fit-photo-preview'></div>
     <div id='fitMealList'></div>
   `;
@@ -2487,6 +2644,37 @@ function addMeal() {
   const meal = { id: id, date: todayStr(), name: name, kcal: kcal === '' ? 0 : Number(kcal), photoId: pendingFitPhoto ? id : null };
   if (pendingFitPhoto) { fitSavePhoto(id, pendingFitPhoto); pendingFitPhoto = ''; }
   f.meals.unshift(meal);
+  saveData(data);
+  renderFitness();
+}
+function previewTextCalories() {
+  const t = document.getElementById('fitMealText');
+  const pv = document.getElementById('fitTextPreview');
+  if (!t || !pv) return;
+  const text = t.value.trim();
+  if (!text) { pv.innerHTML = ''; return; }
+  const r = estimateCalories(text);
+  if (r.items.length === 0) {
+    pv.innerHTML = '<div class="ttp-empty">未识别到已知食物，可手动填热量，或试试：米饭 / 鸡腿 / 牛奶 / 苹果 / 鸡蛋 / 蔬菜 等关键词</div>';
+    return;
+  }
+  pv.innerHTML = '<div class="ttp-list">' + r.items.map(i => `<span class="ttp-item">${escHtml(i.name)} <b>${i.cal}</b> kcal</span>`).join(' + ') + '</div>'
+    + `<div class="ttp-total">合计估算 ≈ <b>${r.total}</b> kcal（点「识别并添加」记入今日）</div>`;
+}
+function addMealFromText() {
+  const t = document.getElementById('fitMealText');
+  if (!t) return;
+  const text = t.value.trim();
+  if (!text) return;
+  const r = estimateCalories(text);
+  if (r.items.length === 0 || r.total <= 0) {
+    const pv = document.getElementById('fitTextPreview');
+    if (pv) pv.innerHTML = '<div class="ttp-empty">未识别到已知食物，请用上方「餐名 + 热量」手动添加，或换更常见的食物词。</div>';
+    return;
+  }
+  const f = getFitness();
+  const id = uid();
+  f.meals.unshift({ id: id, date: todayStr(), name: text, kcal: r.total, photoId: null, auto: true });
   saveData(data);
   renderFitness();
 }
