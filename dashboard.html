@@ -1112,46 +1112,46 @@ const STORE_KEY = 'saki_dashboard_data';
 // ==================== 每日好物推送（由 Saki 每日自动抓取更新，独立于 localStorage） ====================
 const DAILY_GOODNOTES = [
   {
-    title: '卡姿兰小奶猫挂绳防晒，可拆挂绳随手补涂',
-    tags: ['美妆', '防晒', '包挂', '通勤'],
+    title: '七巧眼影盘，39.7元一盘搞定眼影+高光+腮红',
+    tags: ['美妆', '眼影', '学生党', '平价'],
     cover: '', url: '',
-    note: '美妆配饰化代表作：挂包上随手一拉即补涂，冲上品牌防晒回购第一名。',
-    date: '2026-07-28'
+    note: '小红书疯传的学生党宝藏盘：10色带高光腮红一盘多用，粉质细腻带妆8小时不脱，39.7元性价比封神。',
+    date: '2026-07-30'
   },
   {
-    title: 'Rhode 唇釉手机壳，把口红挂在手机上',
-    tags: ['美妆', '数码配饰', '爆款', '海外'],
+    title: '摇滚动物园x茉莉奶白联名挂链护手霜，美妆变包挂',
+    tags: ['美妆', '包挂', '联名', '爆款'],
     cover: '', url: '',
-    note: '上线25分钟抢空、20万人蹲补货，配套唇釉一年卖100万支，单款贡献1.16亿元营收。',
-    date: '2026-07-28'
+    note: '美妆配饰化大潮代表：#挂件气垫搜索同比暴涨11600%，这款挂链护手霜单店卖出2万多支、常年稳居店铺TOP1。',
+    date: '2026-07-30'
   },
   {
-    title: '纽曼 S7 AI 耳夹耳机，99元平价耳挂新宠',
-    tags: ['数码', '耳机', '平价', '通勤'],
+    title: '复古有线耳机，19.9元起的千禧风数码配饰',
+    tags: ['数码', '耳机', 'Y2K', '穿搭'],
     cover: '', url: '',
-    note: '运动佩戴稳固不夹耳、低漏音，总续航48小时，99元价位质感超预期的国货黑马。',
-    date: '2026-07-28'
+    note: '有线耳机凭高颜值翻红：小红书「有线耳机穿搭」笔记超10万篇，马卡龙配色+金属挂链DIY成年轻人新宠。',
+    date: '2026-07-30'
   },
   {
-    title: '硅语生活液态玻璃捏捏袋，非牛顿流体解压潮玩',
-    tags: ['家居', '潮玩', '解压', '治愈'],
+    title: '棉绸阿嬷花裤，9块9的夏日降温神裤',
+    tags: ['穿搭', '阔腿裤', '平价', '清凉'],
     cover: '', url: '',
-    note: '小红书Red甄选选品会人气款：零甲醛+SGS欧盟认证，海洋风捏捏袋捏起来太上头。',
-    date: '2026-07-28'
+    note: '#棉绸穿搭话题3天阅读涨200万：透气吸湿凉过空调房，优衣库H&M跟着上新，拼多多同款月销10万+。',
+    date: '2026-07-30'
   },
   {
-    title: '大宇衣柜循环除湿器，梅雨季衣柜救星',
-    tags: ['家居', '除湿', '刚需', '零耗材'],
+    title: '赵露思同款宽松白T，39.9元穿出少女感',
+    tags: ['穿搭', '白T', '明星同款', '基础款'],
     cover: '', url: '',
-    note: '吸湿力≈5包除湿袋，提示条变色后底座烘干即可重复用，无需插电零耗材更省钱。',
-    date: '2026-07-28'
+    note: '白T随拍半小时点赞破82万，「宽松白T 少女感」小红书搜量一周涨210%，同款淘宝销量曾单日涨12万件。',
+    date: '2026-07-30'
   },
   {
-    title: '壁画收纳箱，小红书收纳榜冠军一物三用',
-    tags: ['家居', '收纳', '小户型', '神器'],
+    title: '野兽派xHello Kitty可外穿家居服，伪睡衣真战袍',
+    tags: ['家居', '联名', '情侣款', '爆款'],
     cover: '', url: '',
-    note: '小红书20大收纳好物榜第一名：平时是挂画/镜子，洗澡时秒变换洗衣物收纳箱。',
-    date: '2026-07-28'
+    note: '今夏可外穿家居服销量TOP1：凉感毛圈提花实测降温2.3℃，上线72小时售罄3批次，#居家OOTD高频出镜。',
+    date: '2026-07-30'
   }
 ];
 
@@ -2573,6 +2573,19 @@ function renderFitness() {
       <input type='text' id='fitMealName' placeholder='餐名，如 午餐' style='min-width:120px'>
       <input type='number' id='fitMealKcal' placeholder='热量 kcal' style='width:120px'>
       <button class='btn btn-primary' onclick="addMeal()">添加</button>
+      <button class='btn btn-accent' onclick="autoRecognizeMeal()">🤖 自动识别</button>
+      <button class='btn btn-sm' title='视觉识别设置' onclick="toggleVisionSettings()">⚙️</button>
+    </div>
+    <div id='visionSettings' style='display:none;margin-top:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);font-size:13px'>
+      <b>🤖 视觉识别设置</b>（仅存本机浏览器，不上传云端）
+      <div style='margin-top:8px'>
+        API Base：<input type='text' id='visBase' placeholder='https://api.openai.com/v1' style='width:240px'><br>
+        API Key：<input type='password' id='visKey' placeholder='sk-...' style='width:240px;margin-top:6px'><br>
+        模型名：<input type='text' id='visModel' placeholder='gpt-4o-mini' style='width:240px;margin-top:6px'><br>
+        <span style='font-size:11px;color:var(--text-dim)'>支持 OpenAI 兼容格式（通义/智谱等均可）。注意：部分服务浏览器直连会被跨域(CORS)拦截，失败时可把照片发到对话让我识别。</span><br>
+        <button class='btn btn-sm btn-primary' style='margin-top:8px' onclick="saveVisionSettings()">保存设置</button>
+        <span id='visSaveMsg' style='margin-left:8px;color:var(--green,#16a34a)'></span>
+      </div>
     </div>
 
     <div class='section-title' style='margin-top:18px'>✍️ 文字描述自动估算热量</div>
@@ -2655,6 +2668,80 @@ function addMeal() {
   f.meals.unshift(meal);
   saveData(data);
   renderFitness();
+}
+
+// ===== 视觉识别（OpenAI 兼容格式，API key 仅存本机浏览器，不进仓库/云同步）=====
+const VISION_CFG_KEY = 'saki_vision_cfg';
+function getVisionCfg() {
+  try { return JSON.parse(localStorage.getItem(VISION_CFG_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveVisionCfg(c) {
+  try { localStorage.setItem(VISION_CFG_KEY, JSON.stringify(c)); } catch (e) {}
+}
+function toggleVisionSettings() {
+  const box = document.getElementById('visionSettings');
+  if (!box) return;
+  const show = !box.style.display || box.style.display === 'none';
+  box.style.display = show ? 'block' : 'none';
+  if (show) {
+    const cfg = getVisionCfg();
+    const b = document.getElementById('visBase'); if (b && cfg.baseUrl) b.value = cfg.baseUrl;
+    const k = document.getElementById('visKey'); if (k && cfg.key) k.value = cfg.key;
+    const m = document.getElementById('visModel'); if (m && cfg.model) m.value = cfg.model;
+  }
+}
+function saveVisionSettings() {
+  const b = document.getElementById('visBase').value.trim();
+  const k = document.getElementById('visKey').value.trim();
+  const m = document.getElementById('visModel').value.trim();
+  if (!b || !k) { alert('请填写 API Base 和 Key'); return; }
+  saveVisionCfg({ baseUrl: b, key: k, model: m || 'gpt-4o-mini' });
+  const msg = document.getElementById('visSaveMsg');
+  if (msg) { msg.textContent = '✓ 已保存'; setTimeout(function () { msg.textContent = ''; }, 2000); }
+}
+async function autoRecognizeMeal() {
+  const cfg = getVisionCfg();
+  if (!cfg.key || !cfg.baseUrl) {
+    alert('请先点 ⚙️ 填写视觉识别 API 的 Base / Key / 模型');
+    toggleVisionSettings();
+    return;
+  }
+  if (!pendingFitPhoto) {
+    alert('请先拍一张食物照片（点「📷 拍照 / 上传」）');
+    return;
+  }
+  const btn = document.querySelector('button[onclick="autoRecognizeMeal()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '🔄 识别中…'; }
+  try {
+    const url = cfg.baseUrl.replace(/\/+$/, '') + '/chat/completions';
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+      body: JSON.stringify({
+        model: cfg.model || 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: '你是营养助手。用户发一张食物照片，请估算这份食物的总热量（kcal）。只返回一个整数，不要任何解释或单位。' },
+          { role: 'user', content: [
+            { type: 'text', text: '这份食物总共大约多少 kcal？只返回一个整数。' },
+            { type: 'image_url', image_url: { url: pendingFitPhoto } }
+          ] }
+        ],
+        max_tokens: 30
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const j = await res.json();
+    const txt = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
+    const num = parseInt((txt + '').replace(/[^\d]/g, ''), 10);
+    if (isNaN(num)) throw new Error('返回无法解析为数字：' + txt);
+    document.getElementById('fitMealKcal').value = num;
+    const nm = document.getElementById('fitMealName');
+    if (nm && !nm.value.trim()) nm.value = 'AI识别餐';
+  } catch (e) {
+    alert('自动识别失败：' + e.message + '\n\n常见原因：\n① 浏览器跨域(CORS)拦截——部分 API 不支持网页直连；\n② key / Base 错误或额度不足。\n\n可改用：把照片发到咱们 WorkBuddy 对话，我(Saki)帮你识别后你填回来。');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '🤖 自动识别'; }
+  }
 }
 function previewTextCalories() {
   const t = document.getElementById('fitMealText');

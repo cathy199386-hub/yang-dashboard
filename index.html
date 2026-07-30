@@ -2573,6 +2573,19 @@ function renderFitness() {
       <input type='text' id='fitMealName' placeholder='餐名，如 午餐' style='min-width:120px'>
       <input type='number' id='fitMealKcal' placeholder='热量 kcal' style='width:120px'>
       <button class='btn btn-primary' onclick="addMeal()">添加</button>
+      <button class='btn btn-accent' onclick="autoRecognizeMeal()">🤖 自动识别</button>
+      <button class='btn btn-sm' title='视觉识别设置' onclick="toggleVisionSettings()">⚙️</button>
+    </div>
+    <div id='visionSettings' style='display:none;margin-top:10px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg-card);font-size:13px'>
+      <b>🤖 视觉识别设置</b>（仅存本机浏览器，不上传云端）
+      <div style='margin-top:8px'>
+        API Base：<input type='text' id='visBase' placeholder='https://api.openai.com/v1' style='width:240px'><br>
+        API Key：<input type='password' id='visKey' placeholder='sk-...' style='width:240px;margin-top:6px'><br>
+        模型名：<input type='text' id='visModel' placeholder='gpt-4o-mini' style='width:240px;margin-top:6px'><br>
+        <span style='font-size:11px;color:var(--text-dim)'>支持 OpenAI 兼容格式（通义/智谱等均可）。注意：部分服务浏览器直连会被跨域(CORS)拦截，失败时可把照片发到对话让我识别。</span><br>
+        <button class='btn btn-sm btn-primary' style='margin-top:8px' onclick="saveVisionSettings()">保存设置</button>
+        <span id='visSaveMsg' style='margin-left:8px;color:var(--green,#16a34a)'></span>
+      </div>
     </div>
 
     <div class='section-title' style='margin-top:18px'>✍️ 文字描述自动估算热量</div>
@@ -2655,6 +2668,80 @@ function addMeal() {
   f.meals.unshift(meal);
   saveData(data);
   renderFitness();
+}
+
+// ===== 视觉识别（OpenAI 兼容格式，API key 仅存本机浏览器，不进仓库/云同步）=====
+const VISION_CFG_KEY = 'saki_vision_cfg';
+function getVisionCfg() {
+  try { return JSON.parse(localStorage.getItem(VISION_CFG_KEY)) || {}; } catch (e) { return {}; }
+}
+function saveVisionCfg(c) {
+  try { localStorage.setItem(VISION_CFG_KEY, JSON.stringify(c)); } catch (e) {}
+}
+function toggleVisionSettings() {
+  const box = document.getElementById('visionSettings');
+  if (!box) return;
+  const show = !box.style.display || box.style.display === 'none';
+  box.style.display = show ? 'block' : 'none';
+  if (show) {
+    const cfg = getVisionCfg();
+    const b = document.getElementById('visBase'); if (b && cfg.baseUrl) b.value = cfg.baseUrl;
+    const k = document.getElementById('visKey'); if (k && cfg.key) k.value = cfg.key;
+    const m = document.getElementById('visModel'); if (m && cfg.model) m.value = cfg.model;
+  }
+}
+function saveVisionSettings() {
+  const b = document.getElementById('visBase').value.trim();
+  const k = document.getElementById('visKey').value.trim();
+  const m = document.getElementById('visModel').value.trim();
+  if (!b || !k) { alert('请填写 API Base 和 Key'); return; }
+  saveVisionCfg({ baseUrl: b, key: k, model: m || 'gpt-4o-mini' });
+  const msg = document.getElementById('visSaveMsg');
+  if (msg) { msg.textContent = '✓ 已保存'; setTimeout(function () { msg.textContent = ''; }, 2000); }
+}
+async function autoRecognizeMeal() {
+  const cfg = getVisionCfg();
+  if (!cfg.key || !cfg.baseUrl) {
+    alert('请先点 ⚙️ 填写视觉识别 API 的 Base / Key / 模型');
+    toggleVisionSettings();
+    return;
+  }
+  if (!pendingFitPhoto) {
+    alert('请先拍一张食物照片（点「📷 拍照 / 上传」）');
+    return;
+  }
+  const btn = document.querySelector('button[onclick="autoRecognizeMeal()"]');
+  if (btn) { btn.disabled = true; btn.textContent = '🔄 识别中…'; }
+  try {
+    const url = cfg.baseUrl.replace(/\/+$/, '') + '/chat/completions';
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + cfg.key },
+      body: JSON.stringify({
+        model: cfg.model || 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: '你是营养助手。用户发一张食物照片，请估算这份食物的总热量（kcal）。只返回一个整数，不要任何解释或单位。' },
+          { role: 'user', content: [
+            { type: 'text', text: '这份食物总共大约多少 kcal？只返回一个整数。' },
+            { type: 'image_url', image_url: { url: pendingFitPhoto } }
+          ] }
+        ],
+        max_tokens: 30
+      })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const j = await res.json();
+    const txt = (j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content) || '';
+    const num = parseInt((txt + '').replace(/[^\d]/g, ''), 10);
+    if (isNaN(num)) throw new Error('返回无法解析为数字：' + txt);
+    document.getElementById('fitMealKcal').value = num;
+    const nm = document.getElementById('fitMealName');
+    if (nm && !nm.value.trim()) nm.value = 'AI识别餐';
+  } catch (e) {
+    alert('自动识别失败：' + e.message + '\n\n常见原因：\n① 浏览器跨域(CORS)拦截——部分 API 不支持网页直连；\n② key / Base 错误或额度不足。\n\n可改用：把照片发到咱们 WorkBuddy 对话，我(Saki)帮你识别后你填回来。');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '🤖 自动识别'; }
+  }
 }
 function previewTextCalories() {
   const t = document.getElementById('fitMealText');
