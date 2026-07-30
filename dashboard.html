@@ -2383,76 +2383,378 @@ document.addEventListener('click', function(e) {
 // ==================== 减脂塑型管理 ====================
 let pendingFitPhoto = '';
 // 常见食物热量库（每「份/个/碗/100g」估算值，单位 kcal，仅供估算参考）
-const FOOD_CALORIE_DB = [
-  { kw:'米饭', cal:230, aliases:['白饭','大米饭','一碗饭'] },
-  { kw:'粥', cal:70, aliases:['白粥','米粥'] },
-  { kw:'馒头', cal:220, aliases:[] },
-  { kw:'面包', cal:130, aliases:['吐司','切片面包'] },
-  { kw:'面条', cal:280, aliases:['面','汤面','拌面'] },
-  { kw:'包子', cal:220, aliases:[] },
-  { kw:'饺子', cal:50, aliases:['水饺'] },
-  { kw:'鸡蛋', cal:70, aliases:['蛋','水煮蛋','煎蛋'] },
-  { kw:'鸡胸肉', cal:130, aliases:['鸡胸'] },
-  { kw:'鸡腿', cal:150, aliases:['鸡腿肉'] },
-  { kw:'鸡肉', cal:160, aliases:['鸡块'] },
-  { kw:'牛肉', cal:250, aliases:['牛排'] },
-  { kw:'猪肉', cal:300, aliases:['五花肉','瘦肉'] },
-  { kw:'鱼肉', cal:120, aliases:['鱼','清蒸鱼'] },
-  { kw:'虾', cal:90, aliases:['虾仁'] },
-  { kw:'牛奶', cal:150, aliases:['纯牛奶','鲜奶'] },
-  { kw:'酸奶', cal:100, aliases:['优格'] },
-  { kw:'豆浆', cal:80, aliases:[] },
-  { kw:'苹果', cal:95, aliases:[] },
-  { kw:'香蕉', cal:105, aliases:[] },
-  { kw:'橙子', cal:70, aliases:['桔子','橘子'] },
-  { kw:'西瓜', cal:60, aliases:[] },
-  { kw:'黄瓜', cal:15, aliases:[] },
-  { kw:'番茄', cal:18, aliases:['西红柿'] },
-  { kw:'青菜', cal:25, aliases:['蔬菜','西兰花','白菜','菠菜'] },
-  { kw:'土豆', cal:150, aliases:['马铃薯'] },
-  { kw:'红薯', cal:130, aliases:['地瓜','番薯'] },
-  { kw:'玉米', cal:200, aliases:[] },
-  { kw:'豆腐', cal:80, aliases:[] },
-  { kw:'沙拉', cal:50, aliases:['蔬菜沙拉'] },
-  { kw:'可乐', cal:140, aliases:['汽水'] },
-  { kw:'咖啡', cal:5, aliases:['美式','黑咖啡'] },
-  { kw:'啤酒', cal:150, aliases:[] },
-  { kw:'蛋糕', cal:350, aliases:[] },
-  { kw:'巧克力', cal:550, aliases:[] },
-  { kw:'饼干', cal:450, aliases:[] },
-  { kw:'薯片', cal:550, aliases:[] },
-  { kw:'坚果', cal:600, aliases:['花生','核桃','腰果'] },
-  { kw:'食用油', cal:120, aliases:['油','炒菜油'] },
-  { kw:'牛肉面', cal:450, aliases:[] },
-  { kw:'披萨', cal:250, aliases:[] },
-  { kw:'汉堡', cal:500, aliases:[] },
-  { kw:'炸鸡', cal:300, aliases:[] },
-  { kw:'寿司', cal:40, aliases:[] },
-  { kw:'麻辣烫', cal:400, aliases:[] },
-  { kw:'麻辣香锅', cal:500, aliases:[] }
-];
+const FOOD_CALORIE_DB = [].concat(
+  /* ===== 主食 / 米面 ===== */
+  [
+    {kw:'米饭',cal:230,aliases:['白饭','大米饭','一碗饭','米饭一碗','糙米饭']},
+    {kw:'粥',cal:70,aliases:['白粥','米粥','小米粥','八宝粥','皮蛋瘦肉粥']},
+    {kw:'馒头',cal:220,aliases:['白馒头','大馒头']},
+    {kw:'花卷',cal:180,aliases:[]},
+    {kw:'面包',cal:130,aliases:['吐司','切片面包','白面包']},
+    {kw:'全麦面包',cal:120,aliases:['全麦吐司']},
+    {kw:'面条',cal:280,aliases:['汤面','拌面','素面','汤面条']},
+    {kw:'炒面',cal:350,aliases:['炒拉面','干炒牛河']},
+    {kw:'包子',cal:220,aliases:['肉包','菜包','小笼包','生煎']},
+    {kw:'饺子',cal:50,aliases:['水饺','蒸饺','锅贴','煎饺']},
+    {kw:'馄饨',cal:40,aliases:['云吞','抄手']},
+    {kw:'烧麦',cal:80,aliases:['烧卖']},
+    {kw:'煎饼',cal:200,aliases:['杂粮煎饼']},
+    {kw:'煎饼果子',cal:300,aliases:['煎饼果仔']},
+    {kw:'手抓饼',cal:300,aliases:[]},
+    {kw:'鸡蛋灌饼',cal:300,aliases:[]},
+    {kw:'葱油饼',cal:300,aliases:[]},
+    {kw:'河粉',cal:250,aliases:['炒河粉']},
+    {kw:'米粉',cal:220,aliases:['炒米粉']},
+    {kw:'肠粉',cal:150,aliases:['虾肠','牛肉肠粉']},
+    {kw:'油条',cal:380,aliases:[]},
+    {kw:'饭团',cal:200,aliases:['糯米饭团','粢饭团']},
+    {kw:'寿司',cal:40,aliases:['寿司卷','加州卷']},
+    {kw:'紫菜包饭',cal:150,aliases:['韩式紫菜卷']},
+    {kw:'披萨',cal:250,aliases:['披萨片','芝士披萨','比萨']},
+    {kw:'芝心披萨',cal:300,aliases:['芝心比萨']},
+    {kw:'汉堡',cal:500,aliases:['牛肉汉堡','鸡肉汉堡']},
+    {kw:'鸡肉卷',cal:400,aliases:['墨西哥卷','鸡肉卷饼']},
+    {kw:'三明治',cal:250,aliases:['三文治','帕尼尼']},
+    {kw:'贝果',cal:250,aliases:['贝果面包','贝果圈']},
+    {kw:'欧包',cal:180,aliases:['欧式面包']},
+    {kw:'可颂',cal:260,aliases:['牛角包']},
+    {kw:'年糕',cal:200,aliases:['炒年糕']},
+    {kw:'汤圆',cal:70,aliases:['元宵']},
+    {kw:'凉皮',cal:350,aliases:['凉皮卷']},
+    {kw:'肉夹馍',cal:300,aliases:['腊汁肉夹馍']}
+  ],
+  /* ===== 蛋白 / 肉类 ===== */
+  [
+    {kw:'鸡蛋',cal:70,aliases:['蛋','水煮蛋','茶叶蛋','煮鸡蛋']},
+    {kw:'煎蛋',cal:90,aliases:['煎鸡蛋','荷包蛋']},
+    {kw:'鸡胸肉',cal:130,aliases:['鸡胸','去皮鸡胸']},
+    {kw:'鸡腿',cal:150,aliases:['鸡腿肉','鸡大腿']},
+    {kw:'鸡翅',cal:120,aliases:['鸡中翅','奥尔良鸡翅']},
+    {kw:'炸鸡',cal:300,aliases:['炸鸡块','鸡米花','韩式炸鸡']},
+    {kw:'烤鸡',cal:200,aliases:['烤鸡肉','烧鸡']},
+    {kw:'牛肉',cal:250,aliases:['牛排','肥牛','牛肉片']},
+    {kw:'红烧肉',cal:400,aliases:['五花肉烧','扣肉']},
+    {kw:'排骨',cal:350,aliases:['红烧排骨','糖醋排骨']},
+    {kw:'猪肉',cal:300,aliases:['瘦肉','猪肉片','里脊']},
+    {kw:'培根',cal:100,aliases:['烟熏培根']},
+    {kw:'火腿',cal:100,aliases:['方火腿','午餐肉']},
+    {kw:'香肠',cal:150,aliases:['烤肠','热狗肠']},
+    {kw:'鱼肉',cal:120,aliases:['鱼','清蒸鱼','鱼肉块']},
+    {kw:'烤鱼',cal:250,aliases:['烤鱼肉','纸包鱼']},
+    {kw:'三文鱼',cal:200,aliases:['生三文鱼']},
+    {kw:'虾',cal:90,aliases:['虾仁','基围虾']},
+    {kw:'蟹',cal:100,aliases:['螃蟹','蟹肉']},
+    {kw:'鱿鱼',cal:80,aliases:['鱿鱼须','花枝']},
+    {kw:'鸭肉',cal:240,aliases:['烤鸭','鸭腿']},
+    {kw:'羊肉',cal:250,aliases:['羊肉串','羊排']},
+    {kw:'牛肉丸',cal:80,aliases:['牛丸','牛肉球']},
+    {kw:'鱼丸',cal:60,aliases:['鱼蛋']},
+    {kw:'热狗',cal:150,aliases:['热狗肠堡']}
+  ],
+  /* ===== 蔬菜 / 菌菇 ===== */
+  [
+    {kw:'黄瓜',cal:15,aliases:['青瓜']},
+    {kw:'番茄',cal:18,aliases:['西红柿']},
+    {kw:'青菜',cal:25,aliases:['蔬菜','西兰花','白菜','菠菜','生菜','油麦菜']},
+    {kw:'胡萝卜',cal:40,aliases:['胡萝卜丝']},
+    {kw:'土豆',cal:150,aliases:['马铃薯','土豆丝']},
+    {kw:'红薯',cal:130,aliases:['地瓜','番薯']},
+    {kw:'玉米',cal:200,aliases:['煮玉米','玉米棒']},
+    {kw:'南瓜',cal:25,aliases:['南瓜块']},
+    {kw:'茄子',cal:25,aliases:['茄子煲']},
+    {kw:'青椒',cal:25,aliases:['甜椒']},
+    {kw:'蘑菇',cal:20,aliases:['香菇','金针菇','杏鲍菇']},
+    {kw:'豆腐',cal:80,aliases:['嫩豆腐','老豆腐']},
+    {kw:'豆芽',cal:30,aliases:['绿豆芽']},
+    {kw:'竹笋',cal:30,aliases:['笋干']},
+    {kw:'木耳',cal:30,aliases:['黑木耳']},
+    {kw:'海带',cal:20,aliases:['海带丝']},
+    {kw:'藕',cal:70,aliases:['莲藕']},
+    {kw:'酸辣土豆丝',cal:150,aliases:['土豆丝']},
+    {kw:'地三鲜',cal:200,aliases:[]},
+    {kw:'凉拌黄瓜',cal:50,aliases:[]},
+    {kw:'沙拉',cal:50,aliases:['蔬菜沙拉','蔬果沙拉','鸡胸沙拉']}
+  ],
+  /* ===== 水果 ===== */
+  [
+    {kw:'苹果',cal:95,aliases:[]},
+    {kw:'香蕉',cal:105,aliases:[]},
+    {kw:'橙子',cal:70,aliases:['桔子','橘子']},
+    {kw:'西瓜',cal:60,aliases:['西瓜块']},
+    {kw:'葡萄',cal:70,aliases:['提子']},
+    {kw:'草莓',cal:30,aliases:['士多啤梨']},
+    {kw:'蓝莓',cal:60,aliases:[]},
+    {kw:'猕猴桃',cal:60,aliases:['奇异果']},
+    {kw:'梨',cal:80,aliases:['雪梨']},
+    {kw:'桃子',cal:50,aliases:['水蜜桃']},
+    {kw:'芒果',cal:80,aliases:[]},
+    {kw:'菠萝',cal:80,aliases:['凤梨']},
+    {kw:'柚子',cal:70,aliases:['西柚']},
+    {kw:'樱桃',cal:50,aliases:[]},
+    {kw:'木瓜',cal:60,aliases:[]},
+    {kw:'牛油果',cal:240,aliases:['鳄梨']},
+    {kw:'椰子',cal:200,aliases:['椰子肉']},
+    {kw:'柠檬',cal:20,aliases:[]},
+    {kw:'柿子',cal:80,aliases:[]},
+    {kw:'荔枝',cal:70,aliases:['荔枝肉']}
+  ],
+  /* ===== 乳制品 / 豆制饮品 ===== */
+  [
+    {kw:'牛奶',cal:150,aliases:['纯牛奶','鲜奶','全脂牛奶']},
+    {kw:'脱脂奶',cal:80,aliases:['脱脂牛奶','低脂奶']},
+    {kw:'酸奶',cal:100,aliases:['优格','发酵乳']},
+    {kw:'希腊酸奶',cal:60,aliases:['希腊式酸奶']},
+    {kw:'豆浆',cal:80,aliases:['豆奶','黄豆浆']},
+    {kw:'奶酪',cal:300,aliases:['芝士','起司']},
+    {kw:'黄油',cal:720,aliases:['牛油']},
+    {kw:'奶油',cal:350,aliases:['淡奶油']},
+    {kw:'炼乳',cal:320,aliases:['炼奶']},
+    {kw:'养乐多',cal:80,aliases:['益力多']},
+    {kw:'豆花',cal:80,aliases:['豆腐花','豆腐脑']}
+  ],
+  /* ===== 基础饮品 ===== */
+  [
+    {kw:'水',cal:0,aliases:['矿泉水','白开水','纯净水']},
+    {kw:'可乐',cal:140,aliases:['汽水','雪碧','芬达']},
+    {kw:'美式',cal:5,aliases:['黑咖啡','冰美式','热美式','美式咖啡']},
+    {kw:'咖啡',cal:5,aliases:['清咖啡']},
+    {kw:'红茶',cal:0,aliases:['绿茶','乌龙茶','茶']},
+    {kw:'奶茶',cal:300,aliases:['珍珠奶茶','波霸奶茶','鲜奶奶茶']},
+    {kw:'芝士奶盖',cal:300,aliases:['奶盖茶']},
+    {kw:'柠檬茶',cal:150,aliases:['冰红茶']},
+    {kw:'果茶',cal:200,aliases:['水果茶','茶派']},
+    {kw:'果汁',cal:120,aliases:['橙汁','苹果汁','葡萄汁','鲜榨果汁']},
+    {kw:'啤酒',cal:150,aliases:['啤','扎啤']},
+    {kw:'红酒',cal:120,aliases:['葡萄酒','红葡萄酒']},
+    {kw:'白酒',cal:200,aliases:['高粱酒']},
+    {kw:'鸡尾酒',cal:200,aliases:['莫吉托','长岛冰茶']},
+    {kw:'运动饮料',cal:100,aliases:['脉动','红牛','功能饮料','电解质水']},
+    {kw:'椰子水',cal:50,aliases:['椰青水']},
+    {kw:'王老吉',cal:100,aliases:['凉茶','加多宝']}
+  ],
+  /* ===== 咖啡 / 茶饮 品牌单品 ===== */
+  [
+    {kw:'manner',cal:150,aliases:['manner咖啡','manner的咖啡','manner美式','manner冰美式']},
+    {kw:'manner拿铁',cal:180,aliases:['manner咖啡拿铁','manner 拿铁']},
+    {kw:'manner澳白',cal:150,aliases:['manner澳瑞白','manner馥芮白']},
+    {kw:'manner卡布',cal:150,aliases:['manner卡布奇诺']},
+    {kw:'manner燕麦拿铁',cal:180,aliases:['manner oat 拿铁']},
+    {kw:'manner生椰拿铁',cal:200,aliases:['manner椰拿铁']},
+    {kw:'瑞幸',cal:180,aliases:['瑞幸咖啡','luckin','瑞幸的咖啡']},
+    {kw:'瑞幸拿铁',cal:180,aliases:['luckin拿铁','瑞幸咖啡拿铁']},
+    {kw:'瑞幸生椰拿铁',cal:210,aliases:['瑞幸椰椰拿铁','luckin生椰拿铁']},
+    {kw:'瑞幸厚乳拿铁',cal:230,aliases:['瑞幸厚牛乳拿铁']},
+    {kw:'瑞幸丝绒拿铁',cal:200,aliases:['瑞幸丝绒陨石拿铁']},
+    {kw:'瑞幸橙C美式',cal:120,aliases:['瑞幸橙c']},
+    {kw:'瑞幸椰云拿铁',cal:200,aliases:[]},
+    {kw:'瑞幸美式',cal:15,aliases:['瑞幸冰美式','luckin美式']},
+    {kw:'星巴克',cal:200,aliases:['星巴克咖啡','starbucks']},
+    {kw:'星巴克拿铁',cal:220,aliases:['星巴克咖啡拿铁']},
+    {kw:'星巴克美式',cal:15,aliases:['星巴克冰美式']},
+    {kw:'星巴克卡布奇诺',cal:130,aliases:[]},
+    {kw:'星巴克馥芮白',cal:170,aliases:['星巴克澳白']},
+    {kw:'星巴克燕麦拿铁',cal:200,aliases:[]},
+    {kw:'星巴克焦糖玛奇朵',cal:240,aliases:[]},
+    {kw:'星巴克摩卡',cal:290,aliases:[]},
+    {kw:'星巴克抹茶拿铁',cal:220,aliases:[]},
+    {kw:'星巴克星冰乐',cal:300,aliases:['星巴克啡快']},
+    {kw:'喜茶多肉葡萄',cal:250,aliases:['喜茶葡萄']},
+    {kw:'喜茶芝芝莓莓',cal:300,aliases:['喜茶草莓']},
+    {kw:'喜茶满杯红柚',cal:200,aliases:[]},
+    {kw:'喜茶奶茶波波',cal:200,aliases:['喜茶波波']},
+    {kw:'喜茶',cal:200,aliases:['喜茶饮品']},
+    {kw:'奈雪霸气芝士草莓',cal:300,aliases:['奈雪草莓']},
+    {kw:'奈雪霸气杨梅',cal:200,aliases:['奈雪杨梅']},
+    {kw:'奈雪',cal:200,aliases:['奈雪的茶']},
+    {kw:'霸王茶姬伯牙绝弦',cal:160,aliases:['伯牙绝弦']},
+    {kw:'霸王茶姬花田乌龙',cal:180,aliases:[]},
+    {kw:'霸王茶姬青青糯山',cal:250,aliases:['青青糯山']},
+    {kw:'霸王茶姬',cal:180,aliases:['霸王茶姬奶茶']},
+    {kw:'蜜雪冰城柠檬水',cal:100,aliases:['蜜雪柠檬水']},
+    {kw:'蜜雪冰城珍珠奶茶',cal:300,aliases:['蜜雪奶茶']},
+    {kw:'蜜雪冰城圣代',cal:200,aliases:['蜜雪圣代']},
+    {kw:'蜜雪冰城',cal:150,aliases:['蜜雪']},
+    {kw:'库迪拿铁',cal:180,aliases:['库迪咖啡拿铁','cotti拿铁']},
+    {kw:'库迪美式',cal:15,aliases:['库迪咖啡美式']},
+    {kw:'幸运咖美式',cal:15,aliases:['幸运咖咖啡美式']},
+    {kw:'幸运咖拿铁',cal:170,aliases:[]},
+    {kw:'三顿半',cal:5,aliases:['三顿半美式','永璞','挂耳美式']},
+    {kw:'茶颜悦色幽兰拿铁',cal:250,aliases:['茶颜拿铁','幽兰拿铁']},
+    {kw:'茶颜悦色',cal:200,aliases:['茶颜']}
+  ],
+  /* ===== 快餐连锁 ===== */
+  [
+    {kw:'肯德基原味鸡',cal:250,aliases:['肯德基鸡块','kfc原味鸡']},
+    {kw:'肯德基香辣鸡腿堡',cal:500,aliases:['肯德基鸡腿堡','kfc鸡腿堡']},
+    {kw:'肯德基劲脆鸡腿堡',cal:500,aliases:[]},
+    {kw:'肯德基上校鸡块',cal:280,aliases:['肯德基鸡块6块']},
+    {kw:'肯德基薯条',cal:230,aliases:['肯德基薯条中','kfc薯条']},
+    {kw:'肯德基奥尔良烤翅',cal:140,aliases:['肯德基烤翅']},
+    {kw:'肯德基蛋挞',cal:200,aliases:['肯德基蛋塔']},
+    {kw:'肯德基鸡米花',cal:300,aliases:[]},
+    {kw:'肯德基鸡肉卷',cal:400,aliases:['肯德基老北京鸡肉卷']},
+    {kw:'肯德基粥',cal:100,aliases:['肯德基皮蛋粥']},
+    {kw:'肯德基',cal:400,aliases:['kfc']},
+    {kw:'麦当劳巨无霸',cal:500,aliases:['麦辣巨无霸','m记巨无霸']},
+    {kw:'麦当劳麦辣鸡腿堡',cal:500,aliases:['麦辣鸡腿堡']},
+    {kw:'麦当劳双层吉士堡',cal:450,aliases:['双层吉士']},
+    {kw:'麦当劳薯条',cal:230,aliases:['麦薯条']},
+    {kw:'麦当劳麦辣鸡翅',cal:200,aliases:['麦辣翅']},
+    {kw:'麦当劳吉士蛋麦满分',cal:300,aliases:['麦满分']},
+    {kw:'麦当劳玉米杯',cal:100,aliases:['麦玉米杯']},
+    {kw:'麦当劳苹果派',cal:200,aliases:['麦当劳派']},
+    {kw:'麦当劳',cal:450,aliases:['m记','mcd']},
+    {kw:'汉堡王华堡',cal:600,aliases:['汉堡王汉堡']},
+    {kw:'汉堡王鸡条',cal:300,aliases:[]},
+    {kw:'汉堡王薯条',cal:250,aliases:[]},
+    {kw:'塔斯汀汉堡',cal:450,aliases:['塔斯汀']},
+    {kw:'赛百味三明治',cal:400,aliases:['赛百味6寸','subway']},
+    {kw:'必胜客披萨',cal:250,aliases:['必胜客比萨']},
+    {kw:'德克士手枪腿',cal:300,aliases:['德克士鸡腿']}
+  ],
+  /* ===== 中式 / 外卖快餐 ===== */
+  [
+    {kw:'黄焖鸡米饭',cal:600,aliases:['黄焖鸡','焖鸡米饭']},
+    {kw:'螺蛳粉',cal:550,aliases:['柳州螺蛳粉']},
+    {kw:'酸辣粉',cal:350,aliases:[]},
+    {kw:'冒菜',cal:500,aliases:['冒菜套餐']},
+    {kw:'麻辣烫',cal:400,aliases:['麻辣烫套餐']},
+    {kw:'麻辣香锅',cal:500,aliases:['香锅']},
+    {kw:'麻辣拌',cal:400,aliases:[]},
+    {kw:'盖饭',cal:600,aliases:['米饭套餐','快餐盖饭']},
+    {kw:'蛋炒饭',cal:300,aliases:['炒饭']},
+    {kw:'扬州炒饭',cal:350,aliases:['什锦炒饭']},
+    {kw:'咖喱饭',cal:500,aliases:['咖喱鸡肉饭','日式咖喱饭']},
+    {kw:'煲仔饭',cal:600,aliases:['腊味煲仔饭']},
+    {kw:'牛肉面',cal:450,aliases:['牛肉拉面','清炖牛肉面']},
+    {kw:'兰州拉面',cal:450,aliases:['兰州牛肉面','牛面']},
+    {kw:'炸酱面',cal:500,aliases:['炸酱捞面']},
+    {kw:'葱油拌面',cal:400,aliases:['葱油面']},
+    {kw:'羊肉泡馍',cal:600,aliases:[]},
+    {kw:'沙县拌面',cal:300,aliases:['沙县']},
+    {kw:'沙县蒸饺',cal:200,aliases:['沙县饺子']},
+    {kw:'烤冷面',cal:350,aliases:[]},
+    {kw:'关东煮',cal:100,aliases:['关东煮拼盘']},
+    {kw:'串串香',cal:300,aliases:['冷锅串串']},
+    {kw:'火锅',cal:800,aliases:['火锅套餐','麻辣火锅']},
+    {kw:'小笼包',cal:200,aliases:['小笼']},
+    {kw:'生煎',cal:200,aliases:['生煎包']},
+    {kw:'卤肉饭',cal:500,aliases:['鲁肉饭']},
+    {kw:'肥牛饭',cal:500,aliases:['肥牛套餐']},
+    {kw:'鳗鱼饭',cal:550,aliases:['鳗鱼饭套餐']},
+    {kw:'照烧鸡饭',cal:500,aliases:[]},
+    {kw:'便当',cal:500,aliases:['日式便当','快餐便当']},
+    {kw:'简餐',cal:500,aliases:[]},
+    {kw:'轻食',cal:350,aliases:['轻食沙拉','健身餐']},
+    {kw:'减脂餐',cal:350,aliases:['减脂套餐']}
+  ],
+  /* ===== 甜点 / 烘焙 / 零食 ===== */
+  [
+    {kw:'蛋糕',cal:350,aliases:['奶油蛋糕','生日蛋糕']},
+    {kw:'芝士蛋糕',cal:350,aliases:['起司蛋糕','乳酪蛋糕']},
+    {kw:'慕斯蛋糕',cal:300,aliases:['慕斯']},
+    {kw:'提拉米苏',cal:300,aliases:[]},
+    {kw:'马卡龙',cal:80,aliases:[]},
+    {kw:'泡芙',cal:200,aliases:['奶油泡芙']},
+    {kw:'蛋挞',cal:200,aliases:['蛋塔']},
+    {kw:'甜甜圈',cal:300,aliases:['多拿滋']},
+    {kw:'曲奇',cal:450,aliases:['饼干','曲奇饼干']},
+    {kw:'巧克力',cal:550,aliases:['黑巧','牛奶巧克力']},
+    {kw:'士力架',cal:250,aliases:[]},
+    {kw:'奥利奥',cal:160,aliases:['OREO']},
+    {kw:'薯片',cal:550,aliases:['薯片袋','洋芋片']},
+    {kw:'瓜子',cal:600,aliases:['葵花籽']},
+    {kw:'花生',cal:600,aliases:['花生米']},
+    {kw:'核桃',cal:650,aliases:['胡桃']},
+    {kw:'腰果',cal:600,aliases:[]},
+    {kw:'杏仁',cal:580,aliases:['巴旦木']},
+    {kw:'夏威夷果',cal:700,aliases:['澳洲坚果']},
+    {kw:'坚果',cal:600,aliases:['混合坚果','每日坚果']},
+    {kw:'果冻',cal:80,aliases:['布丁果冻']},
+    {kw:'棒棒糖',cal:50,aliases:['冰糖葫芦']},
+    {kw:'棉花糖',cal:100,aliases:[]},
+    {kw:'牛轧糖',cal:100,aliases:[]},
+    {kw:'沙琪玛',cal:450,aliases:['萨其马']},
+    {kw:'蛋黄酥',cal:200,aliases:[]},
+    {kw:'凤梨酥',cal:180,aliases:[]},
+    {kw:'麻薯',cal:150,aliases:['麻薯球']},
+    {kw:'华夫饼',cal:300,aliases:['格子饼']},
+    {kw:'冰淇淋',cal:200,aliases:['冰激凌','甜筒','雪糕','冰棍']},
+    {kw:'双皮奶',cal:150,aliases:[]},
+    {kw:'龟苓膏',cal:100,aliases:[]},
+    {kw:'红豆沙',cal:150,aliases:['红豆汤']},
+    {kw:'绿豆沙',cal:150,aliases:['绿豆汤']},
+    {kw:'芝麻糊',cal:180,aliases:['黑芝麻糊']},
+    {kw:'燕麦棒',cal:200,aliases:['能量棒','蛋白棒']},
+    {kw:'威化饼',cal:450,aliases:['威化']}
+  ],
+  /* ===== 便利店 / 早餐 ===== */
+  [
+    {kw:'全家饭团',cal:200,aliases:['饭团','便利店饭团']},
+    {kw:'全家三明治',cal:250,aliases:['便利店三明治','三角三明治']},
+    {kw:'全家便当',cal:500,aliases:['便利店便当']},
+    {kw:'罗森关东煮',cal:100,aliases:['关东煮']},
+    {kw:'煮鸡蛋',cal:70,aliases:['茶叶蛋','卤蛋']},
+    {kw:'玉米',cal:200,aliases:['煮玉米']},
+    {kw:'红薯',cal:130,aliases:['烤红薯','蒸红薯']},
+    {kw:'豆腐脑',cal:80,aliases:['豆花']},
+    {kw:'胡辣汤',cal:150,aliases:[]},
+    {kw:'皮蛋瘦肉粥',cal:150,aliases:['瘦肉粥']},
+    {kw:'小米粥',cal:80,aliases:[]},
+    {kw:'肠粉',cal:150,aliases:[]},
+    {kw:'粢饭团',cal:200,aliases:[]},
+    {kw:'焦圈',cal:300,aliases:[]},
+    {kw:'葱油饼',cal:300,aliases:[]}
+  ],
+  /* ===== 调料 / 酱料 ===== */
+  [
+    {kw:'食用油',cal:120,aliases:['油','炒菜油','花生油']},
+    {kw:'沙拉酱',cal:100,aliases:['蛋黄酱','千岛酱','mayo']},
+    {kw:'番茄酱',cal:30,aliases:['番茄沙司','ketchup']},
+    {kw:'酱油',cal:10,aliases:['生抽','老抽']},
+    {kw:'糖',cal:40,aliases:['白糖','砂糖']},
+    {kw:'蜂蜜',cal:30,aliases:['蜂蜜水']},
+    {kw:'花生酱',cal:100,aliases:['芝麻酱','花生芝麻酱']},
+    {kw:'辣椒油',cal:100,aliases:['辣油','红油']},
+    {kw:'老干妈',cal:100,aliases:['风味豆豉']},
+    {kw:'咖喱块',cal:100,aliases:['咖喱酱']},
+    {kw:'芝麻',cal:120,aliases:['白芝麻','黑芝麻']},
+    {kw:'沙拉汁',cal:80,aliases:['油醋汁','焙煎芝麻汁']}
+  ]
+);
 
-// 文字描述 → 估算热量：按食物关键词 + 前置数量（碗/个/份/根/片/杯/块/条）匹配
+// 文字描述 → 估算热量：支持品牌名、前后数量、去"的/了"助词
 function estimateCalories(text) {
   if (!text) return { total: 0, items: [] };
-  const CN_NUM = { '两':2, '二':2, '三':3, '四':4, '五':5, '六':6, '七':7, '八':8, '九':9, '半':0.5 };
-  const UNIT = '碗个份根片杯块条只袋罐串勺把枚';
-  const ordered = FOOD_CALORIE_DB.slice().sort((a, b) => b.kw.length - a.kw.length);
+  // 清洗：去空格、去"的/了"等助词，便于品牌匹配（如 manner的咖啡 → manner咖啡）
+  const t = String(text).replace(/\s+/g, '').replace(/[的了的]/g, '');
+  const CN_NUM = { '一':1,'壹':1,'两':2,'二':2,'三':3,'四':4,'五':5,'六':6,'七':7,'八':8,'九':9,'半':0.5 };
+  const UNIT = '碗个份根片杯块条只袋罐串勺把枚瓶盒';
+  const longest = f => Math.max(f.kw.length, ...(f.aliases || []).map(a => a.length));
+  // 具体单品（kw 更长）优先于笼统品牌词，避免"星巴克拿铁"被"星巴克"抢占
+  const ordered = FOOD_CALORIE_DB.slice().sort((a, b) => (b.kw.length - a.kw.length) || (longest(b) - longest(a)));
   const consumed = [];
   const items = [];
   let total = 0;
+  const toNum = s => (CN_NUM[s] != null ? CN_NUM[s] : parseFloat(s));
+  const parseQty = (idx, end) => {
+    const before = t.slice(Math.max(0, idx - 10), idx);
+    let m = before.match(new RegExp('(?:(\\d+(?:\\.\\d+)?)|([一二两三四五六七八九半]))\\s*[' + UNIT + ']*\\s*$'));
+    if (m) return toNum(m[1] || m[2]);
+    const after = t.slice(end, end + 8);
+    m = after.match(new RegExp('^\\s*[' + UNIT + ']*\\s*(?:(\\d+(?:\\.\\d+)?)|([一二两三四五六七八九半]))\\s*[' + UNIT + ']*'));
+    if (m) return toNum(m[1] || m[2]);
+    return 1;
+  };
   for (const food of ordered) {
     const keys = [food.kw, ...(food.aliases || [])].sort((a, b) => b.length - a.length);
     for (const k of keys) {
       let from = 0, idx;
-      while ((idx = text.indexOf(k, from)) >= 0) {
+      while ((idx = t.indexOf(k, from)) >= 0) {
         const end = idx + k.length;
         const overlap = consumed.some(c => idx < c[1] && end > c[0]);
         if (!overlap) {
-          const before = text.slice(Math.max(0, idx - 9), idx);
-          const m = before.match(new RegExp('(?:(\\d+(?:\\.\\d+)?)|([两二三四五六七八九半]))\\s*[' + UNIT + ']*\\s*$'));
-          let qty = 1;
-          if (m) qty = m[1] ? parseFloat(m[1]) : (CN_NUM[m[2]] || 1);
+          const qty = parseQty(idx, end);
           const cal = Math.round(food.cal * qty);
           items.push({ name: (qty > 1 ? qty + '×' : '') + k, cal: cal });
           total += cal;
@@ -2751,7 +3053,7 @@ function previewTextCalories() {
   if (!text) { pv.innerHTML = ''; return; }
   const r = estimateCalories(text);
   if (r.items.length === 0) {
-    pv.innerHTML = '<div class="ttp-empty">未识别到已知食物，可手动填热量，或试试：米饭 / 鸡腿 / 牛奶 / 苹果 / 鸡蛋 / 蔬菜 等关键词</div>';
+    pv.innerHTML = '<div class="ttp-empty">未识别到已知食物，可试试：manner拿铁 / 瑞幸生椰拿铁 / 星巴克拿铁 / 黄焖鸡米饭 / 螺蛳粉 / 麻辣烫 / 一碗米饭 / 半个苹果（已支持品牌名，数量可写「2杯」「半份」）</div>';
     return;
   }
   pv.innerHTML = '<div class="ttp-list">' + r.items.map(i => `<span class="ttp-item">${escHtml(i.name)} <b>${i.cal}</b> kcal</span>`).join(' + ') + '</div>'
@@ -2765,7 +3067,7 @@ function addMealFromText() {
   const r = estimateCalories(text);
   if (r.items.length === 0 || r.total <= 0) {
     const pv = document.getElementById('fitTextPreview');
-    if (pv) pv.innerHTML = '<div class="ttp-empty">未识别到已知食物，请用上方「餐名 + 热量」手动添加，或换更常见的食物词。</div>';
+    if (pv) pv.innerHTML = '<div class="ttp-empty">未识别到已知食物，可用上方「餐名 + 热量」手动添加，例如「肯德基原味鸡 250」「星巴克拿铁 220」。已支持 manner / 瑞幸 / 星巴克 / 喜茶 / 霸王茶姬 / 蜜雪 等品牌。</div>';
     return;
   }
   const f = getFitness();
