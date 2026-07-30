@@ -1197,6 +1197,12 @@ const PETS_GRAMMAR = [
   { title: '情态动词表推测', desc: 'must（一定）、can\'t（不可能）、may/might（可能）对现在/过去的推测。' }
 ];
 
+function normalizeFitness(f) {
+  const d = getDefaultData().fitness;
+  if (!f || typeof f !== 'object') return Object.assign({}, d);
+  return Object.assign({}, d, f);
+}
+
 function loadData() {
   try {
     const v1 = JSON.parse(localStorage.getItem(STORE_KEY));
@@ -1220,6 +1226,8 @@ function loadData() {
       merged.goodnotes = v2.goodnotes || merged.goodnotes;
       merged.english = v2.english || merged.english;
     }
+    if (v1 && v1.fitness) merged.fitness = normalizeFitness(v1.fitness);
+    else if (v2 && v2.fitness) merged.fitness = normalizeFitness(v2.fitness);
     return merged;
   } catch {
     return getDefaultData();
@@ -1334,6 +1342,7 @@ async function pullFromCloud() {
       if (remoteTs > localTs) {
         // 云端更新：覆盖本地
         data = Object.assign(getDefaultData(), remote);
+        data.fitness = (remote && remote.fitness) ? normalizeFitness(remote.fitness) : (data.fitness || normalizeFitness());
         saveData(data, true);
         renderAll();
         setSyncBadge('ok');
