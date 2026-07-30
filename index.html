@@ -1112,46 +1112,46 @@ const STORE_KEY = 'saki_dashboard_data';
 // ==================== 每日好物推送（由 Saki 每日自动抓取更新，独立于 localStorage） ====================
 const DAILY_GOODNOTES = [
   {
-    title: '卡姿兰小奶猫挂绳防晒，可拆挂绳随手补涂',
-    tags: ['美妆', '防晒', '包挂', '通勤'],
+    title: '七巧眼影盘，39.7元一盘搞定眼影+高光+腮红',
+    tags: ['美妆', '眼影', '学生党', '平价'],
     cover: '', url: '',
-    note: '美妆配饰化代表作：挂包上随手一拉即补涂，冲上品牌防晒回购第一名。',
-    date: '2026-07-28'
+    note: '小红书疯传的学生党宝藏盘：10色带高光腮红一盘多用，粉质细腻带妆8小时不脱，39.7元性价比封神。',
+    date: '2026-07-30'
   },
   {
-    title: 'Rhode 唇釉手机壳，把口红挂在手机上',
-    tags: ['美妆', '数码配饰', '爆款', '海外'],
+    title: '摇滚动物园x茉莉奶白联名挂链护手霜，美妆变包挂',
+    tags: ['美妆', '包挂', '联名', '爆款'],
     cover: '', url: '',
-    note: '上线25分钟抢空、20万人蹲补货，配套唇釉一年卖100万支，单款贡献1.16亿元营收。',
-    date: '2026-07-28'
+    note: '美妆配饰化大潮代表：#挂件气垫搜索同比暴涨11600%，这款挂链护手霜单店卖出2万多支、常年稳居店铺TOP1。',
+    date: '2026-07-30'
   },
   {
-    title: '纽曼 S7 AI 耳夹耳机，99元平价耳挂新宠',
-    tags: ['数码', '耳机', '平价', '通勤'],
+    title: '复古有线耳机，19.9元起的千禧风数码配饰',
+    tags: ['数码', '耳机', 'Y2K', '穿搭'],
     cover: '', url: '',
-    note: '运动佩戴稳固不夹耳、低漏音，总续航48小时，99元价位质感超预期的国货黑马。',
-    date: '2026-07-28'
+    note: '有线耳机凭高颜值翻红：小红书「有线耳机穿搭」笔记超10万篇，马卡龙配色+金属挂链DIY成年轻人新宠。',
+    date: '2026-07-30'
   },
   {
-    title: '硅语生活液态玻璃捏捏袋，非牛顿流体解压潮玩',
-    tags: ['家居', '潮玩', '解压', '治愈'],
+    title: '棉绸阿嬷花裤，9块9的夏日降温神裤',
+    tags: ['穿搭', '阔腿裤', '平价', '清凉'],
     cover: '', url: '',
-    note: '小红书Red甄选选品会人气款：零甲醛+SGS欧盟认证，海洋风捏捏袋捏起来太上头。',
-    date: '2026-07-28'
+    note: '#棉绸穿搭话题3天阅读涨200万：透气吸湿凉过空调房，优衣库H&M跟着上新，拼多多同款月销10万+。',
+    date: '2026-07-30'
   },
   {
-    title: '大宇衣柜循环除湿器，梅雨季衣柜救星',
-    tags: ['家居', '除湿', '刚需', '零耗材'],
+    title: '赵露思同款宽松白T，39.9元穿出少女感',
+    tags: ['穿搭', '白T', '明星同款', '基础款'],
     cover: '', url: '',
-    note: '吸湿力≈5包除湿袋，提示条变色后底座烘干即可重复用，无需插电零耗材更省钱。',
-    date: '2026-07-28'
+    note: '白T随拍半小时点赞破82万，「宽松白T 少女感」小红书搜量一周涨210%，同款淘宝销量曾单日涨12万件。',
+    date: '2026-07-30'
   },
   {
-    title: '壁画收纳箱，小红书收纳榜冠军一物三用',
-    tags: ['家居', '收纳', '小户型', '神器'],
+    title: '野兽派xHello Kitty可外穿家居服，伪睡衣真战袍',
+    tags: ['家居', '联名', '情侣款', '爆款'],
     cover: '', url: '',
-    note: '小红书20大收纳好物榜第一名：平时是挂画/镜子，洗澡时秒变换洗衣物收纳箱。',
-    date: '2026-07-28'
+    note: '今夏可外穿家居服销量TOP1：凉感毛圈提花实测降温2.3℃，上线72小时售罄3批次，#居家OOTD高频出镜。',
+    date: '2026-07-30'
   }
 ];
 
@@ -1197,6 +1197,12 @@ const PETS_GRAMMAR = [
   { title: '情态动词表推测', desc: 'must（一定）、can\'t（不可能）、may/might（可能）对现在/过去的推测。' }
 ];
 
+function normalizeFitness(f) {
+  const d = getDefaultData().fitness;
+  if (!f || typeof f !== 'object') return Object.assign({}, d);
+  return Object.assign({}, d, f);
+}
+
 function loadData() {
   try {
     const v1 = JSON.parse(localStorage.getItem(STORE_KEY));
@@ -1220,6 +1226,8 @@ function loadData() {
       merged.goodnotes = v2.goodnotes || merged.goodnotes;
       merged.english = v2.english || merged.english;
     }
+    if (v1 && v1.fitness) merged.fitness = normalizeFitness(v1.fitness);
+    else if (v2 && v2.fitness) merged.fitness = normalizeFitness(v2.fitness);
     return merged;
   } catch {
     return getDefaultData();
@@ -1334,6 +1342,7 @@ async function pullFromCloud() {
       if (remoteTs > localTs) {
         // 云端更新：覆盖本地
         data = Object.assign(getDefaultData(), remote);
+        data.fitness = (remote && remote.fitness) ? normalizeFitness(remote.fitness) : (data.fitness || normalizeFitness());
         saveData(data, true);
         renderAll();
         setSyncBadge('ok');
